@@ -5,36 +5,51 @@
 ## Type of change
 
 - [ ] Bug fix
-- [ ] New feature (post-processor behaviour, settings, live-preview decoration, …)
+- [ ] New feature (post-processor, settings, live-preview decorator, …)
 - [ ] Refactor (no behaviour change)
 - [ ] Documentation / ADR
-- [ ] CI / developer tooling
-- [ ] `aozora-wasm` artefact bump
+- [ ] CI / dev tooling / dependency bump
+- [ ] `aozora-wasm` artefact bump (sibling aozora repo tag pin)
 
 ## Affected surface
 
-- [ ] `src/processor.ts`
-- [ ] `src/wasm-loader.ts`
-- [ ] `src/settings.ts`
-- [ ] `src/main.ts`
+- [ ] `src/processor.ts` / `src/inline-processor.ts`
+- [ ] `src/livepreview.ts`
+- [ ] `src/wasm-loader.ts` / `src/aozora-wasm.ts`
+- [ ] `src/encoding.ts` / `src/txt-detector.ts`
+- [ ] `src/settings.ts` / `src/main.ts`
 - [ ] `styles.css`
 - [ ] `manifest.json`
-- [ ] CI / repo plumbing
+- [ ] CI / Dockerfile / Justfile / lefthook
+- [ ] `tests/`
 
 ## Checklist
 
-- [ ] `bun run check` passes locally (Biome lint + format + `tsc --noEmit`).
-- [ ] `bun run build` produces `main.js` and `scripts/check-wasm.mjs` warns / passes as expected.
-- [ ] `bun run validate-manifest` is clean (`manifest.json` shape stays valid).
-- [ ] **Mobile parity** — no Node-side APIs (`fs`, `child_process`, `path`, `os`, …) sneak into `src/**`. ADR-0001.
-- [ ] **Bundle size budget** — the `main.js` artefact stays under 250 KiB compressed; the bundled `aozora.wasm` stays under 2 MiB (lefthook pre-push warns above the threshold).
-- [ ] Plugin loads inside Obsidian Desktop AND Obsidian Mobile without console errors against the example vault under `tests/fixtures/` (note: WASM artefact may be missing in PoC builds — fallback rendering should remain visible).
-- [ ] Updated `CHANGELOG.md` under `[Unreleased]` (or stated why it doesn't need a changelog entry).
-- [ ] Commit messages follow Conventional Commits (lefthook commit-msg hook enforces).
-- [ ] If bumping the `aozora-wasm` artefact: aligned the version with the matching `aozora` repo tag, regenerated `aozora.wasm`, and called out which parser features unlocked in the changelog.
+- [ ] `just ci` passes locally (biome + tsc + wasm rebuild + vitest C1
+  100% gate + esbuild prod + check-wasm hard-fail).
+- [ ] **Mobile parity** — no Node-side APIs (`fs`, `child_process`,
+  `path`, `os`, `fetch` of remote URLs, …) sneak into `src/**`.
+  ADR-0001.
+- [ ] **Bundle size budget** — `aozora.wasm` + `main.js` combined stays
+  under 2 MiB (the `bundle-budget` lefthook pre-push hook enforces it).
+- [ ] **Coverage stays at 100%** for the modules under the `vitest`
+  C1 gate (everything except `src/main.ts` and `src/livepreview.ts`).
+- [ ] Plugin loads inside Obsidian Desktop and Obsidian Mobile without
+  console errors against a real vault. Smoke-tested both Reading view
+  and Live Preview for the touched feature area.
+- [ ] Updated `CHANGELOG.md` under `[Unreleased]` (or stated why no
+  entry is needed).
+- [ ] Commit messages follow Conventional Commits (the
+  `commit-msg` lefthook hook enforces).
+- [ ] If bumping the `aozora-wasm` artefact: matched the version to a
+  released `aozora` repo tag, ran `just wasm` to regenerate
+  `aozora.wasm`, and called out the unlocked parser features in the
+  changelog.
 
 ## How to test
 
 <!-- Reviewer-facing repro steps. For rendering work, include a sample
 ` ```aozora ` block + the expected HTML output. For settings work,
-include the toggle path and the visual difference it produces. -->
+include the toggle path and the visual difference it produces. For
+Live Preview decorator work, include the cursor positions where the
+decoration drops. -->
