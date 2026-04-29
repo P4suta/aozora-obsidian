@@ -47,7 +47,7 @@
     "@vitest/coverage-istanbul": "latest",
     "esbuild": "^0.28.0",
     "fast-check": "^4.0.0",
-    "happy-dom": "^17.0.0",
+    "happy-dom": "^20.9.0",
     "obsidian": "latest",
     "typescript": "^6.0.3",
     "vitest": "latest"
