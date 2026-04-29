@@ -25,6 +25,9 @@ runs inside the multi-stage Dockerfile via `just`. Host prerequisites:
 - **just** (managed via mise / homebrew / curl)
 - **lefthook** (managed via mise / homebrew; run `just hooks` once
   after clone to wire the gate)
+- **typos** — host-level spell-checker, called by the pre-commit
+  hook so feedback is sub-second (mise: `mise use -g typos@latest`,
+  homebrew: `brew install typos-cli`)
 - An Obsidian installation with Developer mode enabled (for end-to-end
   smoke testing)
 

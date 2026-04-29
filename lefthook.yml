@@ -1,6 +1,6 @@
-# Pre-commit / pre-push hooks — every command runs inside the dev /
-# ci container through `just`, never directly on the host. Mirrors
-# the sibling aozora repo's policy (ADR-0002 / Docker-first).
+# Pre-commit / pre-push hooks — strict gate. Most commands run inside
+# the dev / ci container through `just`; typos runs on the host
+# (mise-managed) for sub-second feedback.
 #
 # Enable after clone:  `just hooks` (= `lefthook install`)
 # Disable:             `lefthook uninstall`
@@ -8,24 +8,38 @@
 # Reference: https://lefthook.dev/configuration/
 
 pre-commit:
-  parallel: false
+  parallel: true
   skip:
     - rebase
     - merge
   commands:
     # `bun run check:fix` — biome (lint + format + organize-imports)
     # then tsc --noEmit. Writes are auto-staged so the commit carries
-    # the format pass.
-    check:
+    # the format pass. Glob-restricted to source / config files biome
+    # actually understands.
+    biome:
       glob: "{src,scripts,tests}/**/*.{ts,tsx,js,mjs,cjs,json,jsonc}"
       run: just fix
       stage_fixed: true
+
+    # Spell check — host-level typos (mise-managed; see
+    # CONTRIBUTING.md). Runs in milliseconds, no docker overhead;
+    # everything is in scope (yml / md / rs / ts / Dockerfile alike).
+    typos:
+      run: typos
+
+    # manifest schema validation — gates manifest.json regressions
+    # before they make it into a release zip. Runs in the dev
+    # container so it picks up the same Node/JS toolchain.
+    manifest:
+      glob: "manifest.json"
+      run: docker compose run --rm --no-TTY dev bun run validate-manifest
 
 commit-msg:
   commands:
     # Conventional Commits — type required, scope optional, breaking-`!`
     # optional. Allowed scopes: processor, livepreview, settings, wasm,
-    # styles, manifest, docs, ci, build (see CONTRIBUTING.md).
+    # styles, manifest, docs, ci, build, infra, deps (see CONTRIBUTING.md).
     conventional:
       run: |
         grep -qE '^(feat|fix|docs|style|refactor|perf|test|build|ci|chore|revert)(\(.+\))?!?: .{1,}' {1} \
@@ -45,3 +59,23 @@ pre-push:
     # phases instead of spinning up four times.
     ci:
       run: just ci
+
+    # ADR-0001 caps the bundle (main.js + aozora.wasm combined) at
+    # 2 MiB. Hard fail on the way to remote — ci.yml is informational
+    # for cold runs but local push is the safety net.
+    bundle-budget:
+      run: |
+        BUDGET=$((2 * 1024 * 1024))
+        TOTAL=0
+        for f in main.js aozora.wasm; do
+          if [ -f "$f" ]; then
+            BYTES=$(stat -c %s "$f")
+            TOTAL=$((TOTAL + BYTES))
+            echo "  $f: $BYTES bytes"
+          fi
+        done
+        echo "Total bundle: $TOTAL bytes (budget $BUDGET bytes)"
+        if [ "$TOTAL" -gt "$BUDGET" ]; then
+          echo "FAIL: bundle exceeds 2 MiB budget"
+          exit 1
+        fi
