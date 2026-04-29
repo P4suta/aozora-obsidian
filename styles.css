@@ -1,63 +1,249 @@
 /*
  * styles.css — aozora-obsidian
  *
- * Mirrors the class catalogue emitted by `aozora-render`'s HTML
- * output. All rules scope under `.aozora` so they never leak into
- * the rest of the Obsidian preview.
+ * Two class families coexist here:
+ *   - `aozora-*` — emitted by the WASM renderer (aozora-render in
+ *     the sibling aozora repo). Anything tagged `aozora-bouten`,
+ *     `aozora-tcy`, `aozora-gaiji`, `aozora-container-indent-N`,
+ *     `aozora-section-break`, etc. is the renderer's contract.
+ *   - `aozora--*` (double-dash) and `aozora-livepreview-*` — set by
+ *     this plugin's processor and the CodeMirror 6 ViewPlugin. They
+ *     are the integration surface between the renderer and Obsidian.
+ *
+ * All rules scope under `.aozora` so they never leak into the rest
+ * of the Obsidian preview pane. The Live Preview decorator widgets
+ * live under `.aozora-livepreview-*` and don't need the `.aozora`
+ * ancestor (they're injected directly into CodeMirror's DOM).
  */
 
-/* Base ruby sizing — stays in sync with the parser's <ruby><rt>
- * emission. 0.5em is the canonical Aozora-Bunko ratio (small enough
- * to disambiguate furigana from body text without dwarfing it). */
+/* -------- Base ruby --------------------------------------------------- */
+
 .aozora ruby rt {
   font-size: 0.5em;
   line-height: 1;
 }
 
-/* 傍点 — emphasis dots. Style + position are CSS-variable-driven so
- * the user's theme can override them without touching the plugin. */
+/* -------- 傍点 (bouten / 圏点) --------------------------------------- */
+
 .aozora .aozora-bouten {
   text-emphasis-style: var(--aozora-bouten-style, "sesame");
   text-emphasis-position: var(--aozora-bouten-position, "over right");
 }
 
-/* 縦中横 — tate-chu-yoko. Combines digits / latin runs upright in
- * vertical mode; in horizontal mode the rule below cancels it out. */
+.aozora .aozora-bouten-circle {
+  text-emphasis-style: filled circle;
+}
+.aozora .aozora-bouten-white-circle {
+  text-emphasis-style: open circle;
+}
+.aozora .aozora-bouten-double-circle {
+  text-emphasis-style: double-circle;
+}
+.aozora .aozora-bouten-janome {
+  text-emphasis-style: filled double-circle;
+}
+.aozora .aozora-bouten-goma {
+  text-emphasis-style: filled sesame;
+}
+.aozora .aozora-bouten-white-sesame {
+  text-emphasis-style: open sesame;
+}
+.aozora .aozora-bouten-white-triangle {
+  text-emphasis-style: open triangle;
+}
+.aozora .aozora-bouten-cross {
+  text-emphasis-style: filled cross;
+}
+.aozora .aozora-bouten-wavy-line {
+  text-emphasis: none;
+  text-decoration: wavy underline;
+}
+.aozora .aozora-bouten-under-line {
+  text-emphasis: none;
+  text-decoration: underline;
+}
+.aozora .aozora-bouten-double-under-line {
+  text-emphasis: none;
+  text-decoration: underline double;
+}
+.aozora .aozora-bouten-right {
+  text-emphasis-position: over right;
+}
+.aozora .aozora-bouten-left {
+  text-emphasis-position: under left;
+}
+
+/* -------- 縦中横 (tcy) ------------------------------------------------ */
+
 .aozora .aozora-tcy {
   -webkit-text-combine: horizontal;
   text-combine-upright: all;
 }
 
-/* 字下げ — indent presets. The parser emits class names of the form
- * `aozora-indent-N`; we only style the common 2 / 4 / 6 / 8 cases.
- * Wider indents inherit `padding-inline-start: 0` (no class hit) and
- * fall back to the original aozora source's manual whitespace. */
+/* -------- 字下げ (indent) — leaf and container ----------------------- */
+
+.aozora .aozora-indent {
+  display: inline-block;
+}
+.aozora .aozora-indent-1 {
+  padding-inline-start: 1em;
+}
 .aozora .aozora-indent-2 {
   padding-inline-start: 2em;
+}
+.aozora .aozora-indent-3 {
+  padding-inline-start: 3em;
 }
 .aozora .aozora-indent-4 {
   padding-inline-start: 4em;
 }
+.aozora .aozora-indent-5 {
+  padding-inline-start: 5em;
+}
 .aozora .aozora-indent-6 {
   padding-inline-start: 6em;
+}
+.aozora .aozora-indent-7 {
+  padding-inline-start: 7em;
 }
 .aozora .aozora-indent-8 {
   padding-inline-start: 8em;
 }
 
-/* 改ページ — page-break marker. Matters for print stylesheets / EPUB. */
-.aozora .aozora-page-break {
-  break-after: page;
+.aozora .aozora-container-indent {
+  display: block;
+}
+.aozora .aozora-container-indent[data-amount="1"] {
+  padding-inline-start: 1em;
+}
+.aozora .aozora-container-indent[data-amount="2"] {
+  padding-inline-start: 2em;
+}
+.aozora .aozora-container-indent[data-amount="3"] {
+  padding-inline-start: 3em;
+}
+.aozora .aozora-container-indent[data-amount="4"] {
+  padding-inline-start: 4em;
+}
+.aozora .aozora-container-indent[data-amount="5"] {
+  padding-inline-start: 5em;
+}
+.aozora .aozora-container-indent[data-amount="6"] {
+  padding-inline-start: 6em;
+}
+.aozora .aozora-container-indent[data-amount="7"] {
+  padding-inline-start: 7em;
+}
+.aozora .aozora-container-indent[data-amount="8"] {
+  padding-inline-start: 8em;
 }
 
-/* Writing-mode toggles applied by `processor.ts` based on the user
- * setting. Horizontal is the default for compatibility with the rest
- * of the preview pane; vertical-rl flips into traditional 縦書き. */
+/* -------- 字上げ (align-end) ----------------------------------------- */
+
+.aozora .aozora-align-end {
+  display: inline-block;
+}
+.aozora .aozora-container-align-end {
+  display: block;
+  text-align: end;
+}
+
+/* -------- 改ページ / セクション区切り --------------------------------- */
+
+.aozora .aozora-page-break {
+  break-after: page;
+  border-block-start: 1px dashed var(--background-modifier-border);
+  margin-block: 1em;
+  height: 0;
+}
+
+.aozora .aozora-section-break {
+  text-align: center;
+  margin-block: 1.5em;
+  height: 1em;
+}
+.aozora .aozora-section-break::before {
+  content: "✦ ✦ ✦";
+  opacity: 0.6;
+}
+
+/* -------- 注記 (annotation) ----------------------------------------- */
+
+.aozora .aozora-annotation[hidden] {
+  display: none;
+}
+
+/* -------- 割注 (warichu) -------------------------------------------- */
+
+.aozora .aozora-warichu {
+  font-size: 0.7em;
+  vertical-align: middle;
+  display: inline-block;
+}
+
+/* -------- 返り点 (kaeriten) ----------------------------------------- */
+
+.aozora .aozora-kaeriten {
+  font-size: 0.6em;
+  margin-inline-start: 0.1em;
+  vertical-align: super;
+}
+
+/* -------- 二重ルビ (double-ruby) ------------------------------------ */
+
+.aozora .aozora-double-ruby {
+  font-weight: 600;
+}
+
+/* -------- 外字 (gaiji) — 3-mode dataset switch ----------------------- */
+/*
+ * The container <div> carries `data-aozora-gaiji-mode` (set by the
+ * plugin's processor). The renderer always emits `data-codepoint`
+ * (Resolved cells, space-separated `U+XXXX` list) or
+ * `data-description` (unresolved fallbacks) on every gaiji span;
+ * the dataset selector switches the visual presentation without
+ * a second parser pass.
+ */
+
+.aozora .aozora-gaiji {
+  position: relative;
+}
+
+/* "description" — display the description text as-is (renderer's
+ * default). No CSS override needed; the textContent is the
+ * description payload. */
+
+/* "codepoint" — replace the displayed glyph(s) with the resolved
+ * `U+XXXX` codepoint string. */
+.aozora[data-aozora-gaiji-mode="codepoint"] .aozora-gaiji[data-codepoint] {
+  font-size: 0;
+}
+.aozora[data-aozora-gaiji-mode="codepoint"] .aozora-gaiji[data-codepoint]::before {
+  content: attr(data-codepoint);
+  font-size: 0.85rem;
+  font-family: var(--font-monospace);
+  background-color: var(--background-modifier-form-field);
+  padding: 0 0.2em;
+  border-radius: 3px;
+}
+
+/* "image" — frame the resolved glyph (the renderer's text fallback)
+ * with a glyph-style outline. The full image-URL lookup that needs
+ * a JIS mencode lives JS-side and is wired in by the processor when
+ * the renderer surfaces `data-mencode` (currently unset; image mode
+ * gracefully degrades to an outlined glyph for now). */
+.aozora[data-aozora-gaiji-mode="image"] .aozora-gaiji[data-codepoint] {
+  outline: 1px dashed var(--background-modifier-border);
+  outline-offset: 2px;
+  padding: 0 0.1em;
+}
+
+/* -------- Writing-mode toggles --------------------------------------- */
+
 .aozora--horizontal {
   writing-mode: horizontal-tb;
 }
 .aozora--horizontal .aozora-tcy {
-  /* Cancel `text-combine-upright: all` — irrelevant in horizontal. */
   text-combine-upright: none;
 }
 
@@ -67,13 +253,14 @@
   font-feature-settings: "vert", "vrt2";
 }
 .aozora--vertical .aozora-bouten {
-  /* In vertical writing mode, 傍点 sit on the right side of the
-   * character run, not above. */
-  text-emphasis-position: var(--aozora-bouten-position, "right");
+  text-emphasis-position: var(--aozora-bouten-position-vertical, "right");
+}
+.aozora--vertical .aozora-bouten-left {
+  text-emphasis-position: left;
 }
 
-/* Diagnostic banner appended by the post-processor when the parser
- * flags warnings (unclosed bracket, unregistered sentinel, …). */
+/* -------- Diagnostic banner ------------------------------------------ */
+
 .aozora .aozora-diagnostics {
   margin-top: 0.5em;
   padding: 0.25em 0.5em;
@@ -82,9 +269,8 @@
   border-inline-start: 2px solid var(--background-modifier-border);
 }
 
-/* Fallback rendering when the WASM module fails to load (PoC: the
- * artifact isn't bundled yet). Keep the user's source visible rather
- * than silently dropping the block. */
+/* -------- Fallback (WASM unavailable) -------------------------------- */
+
 .aozora--fallback {
   border: 1px dashed var(--background-modifier-border);
   padding: 0.5em;
@@ -98,4 +284,19 @@
   margin: 0;
   white-space: pre-wrap;
   font-family: var(--font-monospace);
+}
+
+/* -------- Live Preview decorator widgets ----------------------------- */
+
+.aozora-livepreview-ruby rt {
+  font-size: 0.5em;
+  line-height: 1;
+}
+.aozora-livepreview-gaiji {
+  outline: 1px dotted var(--background-modifier-border);
+  padding: 0 0.1em;
+}
+.aozora-livepreview-mark {
+  background-color: var(--background-modifier-hover);
+  border-radius: 2px;
 }
