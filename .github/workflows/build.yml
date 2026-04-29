@@ -6,6 +6,12 @@ on:
   pull_request:
   workflow_dispatch:
 
+# Least-privilege default — every step here is read-only relative
+# to the repo. release.yml separately declares `contents: write` for
+# the GitHub Release publish step.
+permissions:
+  contents: read
+
 jobs:
   ci:
     name: lint + typecheck + test + build
