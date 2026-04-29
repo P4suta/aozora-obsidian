@@ -1,0 +1,22 @@
+[default]
+extend-ignore-identifiers-re = [
+    "[A-Fa-f0-9]{7,}",
+]
+
+[default.extend-words]
+aozora     = "aozora"
+obsidian   = "obsidian"
+codemirror = "codemirror"
+furigana   = "furigana"
+bouten     = "bouten"
+P4suta     = "P4suta"
+Yasunobu   = "Yasunobu"
+
+[files]
+extend-exclude = [
+    "node_modules/",
+    "main.js",
+    "main.js.map",
+    "*.lock",
+    "package-lock.json",
+]

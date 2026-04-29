@@ -1,0 +1,100 @@
+name: Bug report
+description: Report broken aozora rendering, plugin load failures, mobile-specific regressions, or settings panel misbehaviour in aozora-obsidian.
+title: "[bug] "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to report an issue. The single most
+        valuable thing you can supply is a **minimal reproducing
+        markdown** — the shortest fenced ` ```aozora ` block (or `.txt`
+        file) that triggers the issue, plus the rendered output you
+        actually see.
+
+        If the underlying bug is in the parser itself (panic on
+        well-formed Aozora notation, wrong AST, gaiji misresolution),
+        please file it on the
+        [`aozora` repo](https://github.com/P4suta/aozora/issues/new/choose)
+        instead — aozora-obsidian just bundles that parser as WASM.
+
+  - type: input
+    id: component
+    attributes:
+      label: Affected surface
+      description: post-processor / live preview / settings panel / WASM load / mobile-only
+      placeholder: e.g. post-processor
+    validations:
+      required: true
+
+  - type: textarea
+    id: input
+    attributes:
+      label: Minimal reproducing input
+      description: |
+        The shortest aozora source that triggers the bug, inside a
+        fenced code block tagged `aozora`. Attach the file if it's
+        larger than ~30 lines.
+      placeholder: |
+        ```aozora
+        ｜青梅《おうめ》
+        ［＃ここから2字下げ］
+        ```
+      render: text
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected rendering
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual rendering
+      description: Include any console errors (Ctrl/Cmd+Shift+I → Console) and a screenshot if the visual output is wrong.
+    validations:
+      required: true
+
+  - type: input
+    id: version
+    attributes:
+      label: aozora-obsidian version
+      description: From the Community Plugins panel in Obsidian, or the `version` in `manifest.json` if installed manually.
+      placeholder: 0.1.0
+    validations:
+      required: true
+
+  - type: input
+    id: obsidian
+    attributes:
+      label: Obsidian version
+      description: "Settings → About → Current version"
+      placeholder: 1.7.4 (Installer 1.6.7)
+    validations:
+      required: true
+
+  - type: dropdown
+    id: platform
+    attributes:
+      label: Platform
+      multiple: true
+      options:
+        - macOS
+        - Windows
+        - Linux
+        - iOS
+        - iPadOS
+        - Android
+    validations:
+      required: true
+
+  - type: input
+    id: wasm
+    attributes:
+      label: aozora-wasm version (if known)
+      description: If you built the WASM artifact yourself, the matching `aozora` git tag or commit SHA.
+      placeholder: v0.2.0 / commit abcd1234

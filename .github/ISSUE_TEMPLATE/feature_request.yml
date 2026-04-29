@@ -1,0 +1,46 @@
+name: Feature request
+description: Propose a new rendering behaviour, settings option, live-preview decoration, or mobile-specific affordance for aozora-obsidian.
+title: "[feature] "
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Feature requests for the **parser** itself (new Aozora
+        notation, AST shape, gaiji handling) belong on the
+        [`aozora` repo](https://github.com/P4suta/aozora/issues/new/choose).
+        Anything Obsidian-surface (post-processor behaviour, live-preview
+        decorations, settings panel, mobile UX) belongs here.
+
+  - type: input
+    id: component
+    attributes:
+      label: Surface
+      placeholder: post-processor / live-preview / settings / styles / WASM bundling / docs
+    validations:
+      required: true
+
+  - type: textarea
+    id: motivation
+    attributes:
+      label: Motivation
+      description: What can't you do today, and how does this feature help? Reference the use case if you can.
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed shape
+      description: |
+        For rendering: input ↔ expected HTML pair.
+        For settings: the new toggle, its default, and what behaviour it gates.
+        For live-preview: the CodeMirror decoration class + when it triggers.
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      description: Existing workarounds, similar features in other Obsidian plugins (japanese-novel-ruby, etc.).

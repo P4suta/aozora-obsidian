@@ -1,0 +1,101 @@
+/*
+ * styles.css — aozora-obsidian
+ *
+ * Mirrors the class catalogue emitted by `aozora-render`'s HTML
+ * output. All rules scope under `.aozora` so they never leak into
+ * the rest of the Obsidian preview.
+ */
+
+/* Base ruby sizing — stays in sync with the parser's <ruby><rt>
+ * emission. 0.5em is the canonical Aozora-Bunko ratio (small enough
+ * to disambiguate furigana from body text without dwarfing it). */
+.aozora ruby rt {
+  font-size: 0.5em;
+  line-height: 1;
+}
+
+/* 傍点 — emphasis dots. Style + position are CSS-variable-driven so
+ * the user's theme can override them without touching the plugin. */
+.aozora .aozora-bouten {
+  text-emphasis-style: var(--aozora-bouten-style, "sesame");
+  text-emphasis-position: var(--aozora-bouten-position, "over right");
+}
+
+/* 縦中横 — tate-chu-yoko. Combines digits / latin runs upright in
+ * vertical mode; in horizontal mode the rule below cancels it out. */
+.aozora .aozora-tcy {
+  -webkit-text-combine: horizontal;
+  text-combine-upright: all;
+}
+
+/* 字下げ — indent presets. The parser emits class names of the form
+ * `aozora-indent-N`; we only style the common 2 / 4 / 6 / 8 cases.
+ * Wider indents inherit `padding-inline-start: 0` (no class hit) and
+ * fall back to the original aozora source's manual whitespace. */
+.aozora .aozora-indent-2 {
+  padding-inline-start: 2em;
+}
+.aozora .aozora-indent-4 {
+  padding-inline-start: 4em;
+}
+.aozora .aozora-indent-6 {
+  padding-inline-start: 6em;
+}
+.aozora .aozora-indent-8 {
+  padding-inline-start: 8em;
+}
+
+/* 改ページ — page-break marker. Matters for print stylesheets / EPUB. */
+.aozora .aozora-page-break {
+  break-after: page;
+}
+
+/* Writing-mode toggles applied by `processor.ts` based on the user
+ * setting. Horizontal is the default for compatibility with the rest
+ * of the preview pane; vertical-rl flips into traditional 縦書き. */
+.aozora--horizontal {
+  writing-mode: horizontal-tb;
+}
+.aozora--horizontal .aozora-tcy {
+  /* Cancel `text-combine-upright: all` — irrelevant in horizontal. */
+  text-combine-upright: none;
+}
+
+.aozora--vertical {
+  writing-mode: vertical-rl;
+  text-orientation: upright;
+  font-feature-settings: "vert", "vrt2";
+}
+.aozora--vertical .aozora-bouten {
+  /* In vertical writing mode, 傍点 sit on the right side of the
+   * character run, not above. */
+  text-emphasis-position: var(--aozora-bouten-position, "right");
+}
+
+/* Diagnostic banner appended by the post-processor when the parser
+ * flags warnings (unclosed bracket, unregistered sentinel, …). */
+.aozora .aozora-diagnostics {
+  margin-top: 0.5em;
+  padding: 0.25em 0.5em;
+  font-size: 0.8em;
+  color: var(--text-muted);
+  border-inline-start: 2px solid var(--background-modifier-border);
+}
+
+/* Fallback rendering when the WASM module fails to load (PoC: the
+ * artifact isn't bundled yet). Keep the user's source visible rather
+ * than silently dropping the block. */
+.aozora--fallback {
+  border: 1px dashed var(--background-modifier-border);
+  padding: 0.5em;
+}
+.aozora--fallback .aozora-fallback-banner {
+  font-size: 0.8em;
+  color: var(--text-warning);
+  margin-bottom: 0.25em;
+}
+.aozora--fallback pre {
+  margin: 0;
+  white-space: pre-wrap;
+  font-family: var(--font-monospace);
+}

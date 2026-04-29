@@ -1,0 +1,40 @@
+aozora-obsidian — Obsidian plugin rendering Aozora Bunko notation
+Copyright (c) the aozora-obsidian contributors
+
+This NOTICE file is a convenience index of third-party material incorporated
+into the aozora-obsidian source repository. It does not replace the
+individual license files and source-level attributions; those remain the
+authoritative record. Unless specified otherwise in one of the sections
+below, everything else in this repository is original aozora-obsidian code
+and is dual-licensed under Apache-2.0 OR MIT (see LICENSE-APACHE and
+LICENSE-MIT).
+
+
+================================================================================
+1. Sibling project: aozora (Apache-2.0 OR MIT)
+================================================================================
+
+aozora-obsidian invokes the `aozora` parser to translate Aozora Bunko
+notation into HTML inside the editor's preview pane. The integration shape
+— bundled WASM vs spawned binary — is recorded in ADR-0001. aozora is
+dual-licensed under Apache-2.0 OR MIT; see
+https://github.com/P4suta/aozora/blob/main/NOTICE for the third-party
+attributions.
+
+
+================================================================================
+2. Obsidian plugin API (MIT)
+================================================================================
+
+aozora-obsidian builds against the `obsidian` npm package
+(https://github.com/obsidianmd/obsidian-api), the official type definitions
+for the Obsidian plugin API. Copyright (c) 2020-present Obsidian, MIT
+licensed.
+
+
+================================================================================
+3. aozora-obsidian (Apache-2.0 OR MIT)
+================================================================================
+
+All original aozora-obsidian source code is dual-licensed under Apache-2.0
+OR MIT at the user's option.

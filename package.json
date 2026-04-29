@@ -1,0 +1,48 @@
+{
+  "name": "aozora-obsidian",
+  "version": "0.1.0",
+  "description": "Obsidian plugin rendering pure Aozora Bunko notation, powered by a bundled aozora-wasm parser.",
+  "main": "main.js",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "node esbuild.config.mjs",
+    "build": "bun run check && node esbuild.config.mjs production && node scripts/check-wasm.mjs",
+    "typecheck": "tsc --noEmit",
+    "lint": "biome lint .",
+    "lint:fix": "biome lint --write .",
+    "format": "biome format --write .",
+    "format:check": "biome format .",
+    "check": "biome check . && tsc --noEmit",
+    "check:fix": "biome check --write . && tsc --noEmit",
+    "validate-manifest": "node scripts/validate-manifest.mjs",
+    "test": "vitest run"
+  },
+  "keywords": [
+    "obsidian",
+    "obsidian-plugin",
+    "aozora",
+    "japanese",
+    "ruby",
+    "tategaki",
+    "wasm"
+  ],
+  "author": "aozora-obsidian contributors",
+  "license": "(Apache-2.0 OR MIT)",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/P4suta/aozora-obsidian.git"
+  },
+  "homepage": "https://github.com/P4suta/aozora-obsidian",
+  "bugs": "https://github.com/P4suta/aozora-obsidian/issues",
+  "devDependencies": {
+    "@biomejs/biome": "^2.4.13",
+    "@codemirror/state": "^6.0.0",
+    "@codemirror/view": "^6.0.0",
+    "@types/node": "^25.6.0",
+    "esbuild": "^0.28.0",
+    "obsidian": "latest",
+    "typescript": "^6.0.3",
+    "vitest": "latest"
+  }
+}

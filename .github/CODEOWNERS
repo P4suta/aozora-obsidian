@@ -1,0 +1,8 @@
+# GitHub auto-requests review from CODEOWNERS on PRs.
+# aozora-obsidian is a single-maintainer project; route everything to @P4suta.
+
+* @P4suta
+
+/.github/workflows/ @P4suta
+/src/                @P4suta
+/scripts/            @P4suta

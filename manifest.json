@@ -1,0 +1,11 @@
+{
+  "id": "aozora",
+  "name": "Aozora Bunko Notation",
+  "version": "0.1.0",
+  "minAppVersion": "1.5.0",
+  "description": "Render pure Aozora Bunko (青空文庫) notation — ruby, bouten, 縦中横, 字下げ, 外字, 返り点, accent decomposition — in Obsidian's preview pane. Powered by a bundled aozora-wasm parser; works on desktop and mobile alike.",
+  "author": "aozora-obsidian contributors",
+  "authorUrl": "https://github.com/P4suta/aozora-obsidian",
+  "fundingUrl": "",
+  "isDesktopOnly": false
+}
