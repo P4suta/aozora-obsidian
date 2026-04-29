@@ -6,9 +6,11 @@ on:
   pull_request:
   workflow_dispatch:
 
-# Least-privilege default — every step here is read-only relative
-# to the repo. release.yml separately declares `contents: write` for
-# the GitHub Release publish step.
+# Default-deny — every job inherits read-only access to repo
+# contents and nothing else. The build job only reads source +
+# uploads an artefact via actions/upload-artifact; the typos job
+# only reads source. Any future job that needs more (e.g. write
+# packages, comment on PRs) overrides this at the job level.
 permissions:
   contents: read
 

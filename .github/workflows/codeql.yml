@@ -1,0 +1,52 @@
+name: CodeQL
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  schedule:
+    # Monday 02:00 UTC — same cadence dependabot uses, so security
+    # rebases land in one weekly window.
+    - cron: "0 2 * * 1"
+
+permissions:
+  contents: read
+
+jobs:
+  analyze:
+    name: Analyze (${{ matrix.language }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      # Required for github/codeql-action/analyze to upload SARIF.
+      security-events: write
+      # codeql-action reads action versions to invalidate its cache.
+      actions: read
+      contents: read
+    strategy:
+      fail-fast: false
+      matrix:
+        language:
+          # Plugin source — Bun bundle / TypeScript.
+          - javascript-typescript
+          # Workflow yml — catches missing permissions, third-party
+          # action vulnerabilities, untrusted-checkout patterns, etc.
+          - actions
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v3
+        with:
+          languages: ${{ matrix.language }}
+          # `security-and-quality` is the broader query suite; covers
+          # the security default plus maintainability / correctness.
+          queries: security-and-quality
+
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v3
+        with:
+          category: "/language:${{ matrix.language }}"
