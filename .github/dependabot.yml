@@ -1,5 +1,6 @@
 version: 2
 updates:
+  # GitHub Actions — keep SHA pins / version tags fresh weekly.
   - package-ecosystem: github-actions
     directory: "/"
     schedule:
@@ -12,8 +13,10 @@ updates:
       actions-sha-bumps:
         patterns: ["*"]
 
+  # npm (bun-managed package.json). Group minor + patch bumps so
+  # routine drift lands as a single PR; major bumps come through
+  # individually for manual review.
   - package-ecosystem: npm
-    # Bumps the plugin's bun-managed package.json.
     directory: "/"
     schedule:
       interval: weekly
@@ -24,3 +27,29 @@ updates:
     groups:
       npm-deps:
         patterns: ["*"]
+        update-types: ["minor", "patch"]
+
+  # Dockerfile FROM pins — Rust toolchain image, oven/bun image,
+  # binaryen apt package version (via bookworm). Weekly so security
+  # patches surface promptly.
+  - package-ecosystem: docker
+    directory: "/"
+    schedule:
+      interval: weekly
+      day: monday
+      time: "02:00"
+      timezone: "Asia/Tokyo"
+    open-pull-requests-limit: 5
+    groups:
+      docker-base-images:
+        patterns: ["*"]
+
+  # devcontainers/features pinned in .devcontainer/devcontainer.json.
+  - package-ecosystem: devcontainers
+    directory: "/"
+    schedule:
+      interval: weekly
+      day: monday
+      time: "02:00"
+      timezone: "Asia/Tokyo"
+    open-pull-requests-limit: 5
