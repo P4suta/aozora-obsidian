@@ -23,6 +23,11 @@ ARG RUST_VERSION=1.95.0
 ARG BUN_VERSION=1.2.23
 ARG WASM_PACK_VERSION=0.14.0
 ARG JUST_VERSION=1.36.0
+# Upstream binaryen — Debian Bookworm's apt binaryen lags far enough
+# behind that wasm-opt rejects Rust 1.95's bulk-memory + sign-ext
+# opcodes even with `--all-features`. Pulling the prebuilt release
+# from the WebAssembly/binaryen GitHub releases keeps us current.
+ARG BINARYEN_VERSION=129
 
 ##############################################################################
 # Stage: wasm-toolchain — Rust + wasm-pack + binaryen + system deps
@@ -40,8 +45,16 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
         mold \
         curl \
         git \
-        ca-certificates \
-        binaryen
+        ca-certificates
+
+# Install upstream binaryen (wasm-opt + friends) at a known-current
+# version. Replaces apt's stale binaryen; required for Rust 1.95's
+# bulk-memory + sign-ext opcodes.
+ARG BINARYEN_VERSION
+RUN curl -fsSL \
+    "https://github.com/WebAssembly/binaryen/releases/download/version_${BINARYEN_VERSION}/binaryen-version_${BINARYEN_VERSION}-x86_64-linux.tar.gz" \
+    | tar -xzC /usr/local --strip-components=1 \
+    && wasm-opt --version
 
 RUN rustup target add wasm32-unknown-unknown
 
