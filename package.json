@@ -16,7 +16,7 @@
     "check": "biome check . && tsc --noEmit",
     "check:fix": "biome check --write . && tsc --noEmit",
     "validate-manifest": "node scripts/validate-manifest.mjs",
-    "test": "vitest run"
+    "test": "vitest run --coverage"
   },
   "keywords": [
     "obsidian",
@@ -35,12 +35,19 @@
   },
   "homepage": "https://github.com/P4suta/aozora-obsidian",
   "bugs": "https://github.com/P4suta/aozora-obsidian/issues",
+  "dependencies": {
+    "aozora-wasm": "file:./pkg",
+    "minimatch": "^10.0.0"
+  },
   "devDependencies": {
     "@biomejs/biome": "^2.4.13",
     "@codemirror/state": "^6.0.0",
     "@codemirror/view": "^6.0.0",
     "@types/node": "^25.6.0",
+    "@vitest/coverage-istanbul": "latest",
     "esbuild": "^0.28.0",
+    "fast-check": "^4.0.0",
+    "happy-dom": "^17.0.0",
     "obsidian": "latest",
     "typescript": "^6.0.3",
     "vitest": "latest"
