@@ -45,3 +45,10 @@ jobs:
             aozora-obsidian/aozora.wasm
           if-no-files-found: error
           retention-days: 14
+
+  typos:
+    name: typos
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: crate-ci/typos@v1
