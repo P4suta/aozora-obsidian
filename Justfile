@@ -74,6 +74,18 @@ shell:
 bun *ARGS:
     {{_dev}} bun {{ARGS}}
 
+# --- git hooks ----------------------------------------------------------------
+
+# Install lefthook git hooks (pre-commit / commit-msg / pre-push).
+# Idempotent — safe to re-run after lefthook.yml edits to refresh stubs.
+# Requires lefthook on the host PATH (mise / homebrew / curl install).
+hooks:
+    lefthook install
+
+# Remove lefthook git hook stubs from .git/hooks/.
+hooks-uninstall:
+    lefthook uninstall
+
 # --- aggregate ----------------------------------------------------------------
 
 # Local replica of the CI pipeline. Run before pushing.
