@@ -87,13 +87,13 @@ services:
       - -c
       - |
         wasm-pack build --target web --release crates/aozora-wasm
-        # `--all-features` enables every WebAssembly proposal that
-        # current binaryen knows about (bulk-memory, sign-ext,
-        # nontrapping-fptoint, mutable-globals, multivalue, …).
-        # Rust 1.95 emits sign-ext + bulk-memory by default; without
-        # this flag wasm-opt rejects the input as "all used features
-        # should be allowed".
-        wasm-opt -O3 --all-features \
+        # `--all-features` covers most WASM proposals (bulk-memory,
+        # sign-ext, nontrapping-fptoint, mutable-globals, multivalue,
+        # …) but binaryen v119+ split `bulk-memory-opt` into its own
+        # feature gate that `--all-features` no longer implies. Rust
+        # 1.95 emits memory.copy via the new gate, so we add it
+        # explicitly.
+        wasm-opt -O3 --all-features --enable-bulk-memory-opt \
           crates/aozora-wasm/pkg/aozora_wasm_bg.wasm \
           -o /workspace/aozora.wasm
         # Vendor the wasm-bindgen JS glue + .d.ts under

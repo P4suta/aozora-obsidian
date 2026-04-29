@@ -79,7 +79,7 @@ RUN --mount=type=cache,target=/usr/local/cargo/registry,sharing=locked \
     --mount=type=cache,target=/aozora/target,sharing=locked \
     wasm-pack build --target web --release crates/aozora-wasm && \
     mkdir -p /out && \
-    wasm-opt -O3 --all-features \
+    wasm-opt -O3 --all-features --enable-bulk-memory-opt \
         crates/aozora-wasm/pkg/aozora_wasm_bg.wasm \
         -o /out/aozora.wasm && \
     cp -r crates/aozora-wasm/pkg /out/pkg
