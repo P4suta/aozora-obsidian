@@ -48,13 +48,19 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
         ca-certificates
 
 # Install upstream binaryen (wasm-opt + friends) at a known-current
-# version. Replaces apt's stale binaryen; required for Rust 1.95's
-# bulk-memory + sign-ext opcodes.
+# version. The bundle lands under /opt/binaryen so it is NOT on PATH
+# — wasm-pack auto-detects `wasm-opt` from PATH and ignores
+# `wasm-opt = false` in package metadata when it succeeds at finding
+# one (regression in wasm-pack 0.14). Hiding the binary from PATH
+# guarantees wasm-pack skips its broken wasm-opt path; we invoke
+# /opt/binaryen/bin/wasm-opt by absolute path from docker-compose's
+# wasm service afterwards with the right feature flags for Rust 1.95.
 ARG BINARYEN_VERSION
-RUN curl -fsSL \
-    "https://github.com/WebAssembly/binaryen/releases/download/version_${BINARYEN_VERSION}/binaryen-version_${BINARYEN_VERSION}-x86_64-linux.tar.gz" \
-    | tar -xzC /usr/local --strip-components=1 \
-    && wasm-opt --version
+RUN mkdir -p /opt/binaryen \
+    && curl -fsSL \
+        "https://github.com/WebAssembly/binaryen/releases/download/version_${BINARYEN_VERSION}/binaryen-version_${BINARYEN_VERSION}-x86_64-linux.tar.gz" \
+        | tar -xzC /opt/binaryen --strip-components=1 \
+    && /opt/binaryen/bin/wasm-opt --version
 
 RUN rustup target add wasm32-unknown-unknown
 
@@ -79,7 +85,7 @@ RUN --mount=type=cache,target=/usr/local/cargo/registry,sharing=locked \
     --mount=type=cache,target=/aozora/target,sharing=locked \
     wasm-pack build --target web --release crates/aozora-wasm && \
     mkdir -p /out && \
-    wasm-opt -O3 --all-features --enable-bulk-memory-opt \
+    /opt/binaryen/bin/wasm-opt -O3 --all-features --enable-bulk-memory-opt \
         crates/aozora-wasm/pkg/aozora_wasm_bg.wasm \
         -o /out/aozora.wasm && \
     cp -r crates/aozora-wasm/pkg /out/pkg

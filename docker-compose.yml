@@ -93,7 +93,7 @@ services:
         # feature gate that `--all-features` no longer implies. Rust
         # 1.95 emits memory.copy via the new gate, so we add it
         # explicitly.
-        wasm-opt -O3 --all-features --enable-bulk-memory-opt \
+        /opt/binaryen/bin/wasm-opt -O3 --all-features --enable-bulk-memory-opt \
           crates/aozora-wasm/pkg/aozora_wasm_bg.wasm \
           -o /workspace/aozora.wasm
         # Vendor the wasm-bindgen JS glue + .d.ts under
