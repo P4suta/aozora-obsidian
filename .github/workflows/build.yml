@@ -1,0 +1,47 @@
+name: build
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  ci:
+    name: lint + typecheck + test + build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout aozora-obsidian
+        uses: actions/checkout@v4
+        with:
+          path: aozora-obsidian
+
+      - name: Checkout sibling aozora crate
+        uses: actions/checkout@v4
+        with:
+          repository: P4suta/aozora
+          path: aozora
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Install just on the runner
+        run: |
+          curl -fsSL https://just.systems/install.sh \
+            | sudo bash -s -- --to /usr/local/bin --tag 1.36.0
+
+      - name: Run full CI pipeline (check + wasm + test + build)
+        working-directory: aozora-obsidian
+        run: just ci
+
+      - name: Upload built plugin artefacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: aozora-obsidian-plugin
+          path: |
+            aozora-obsidian/main.js
+            aozora-obsidian/manifest.json
+            aozora-obsidian/styles.css
+            aozora-obsidian/aozora.wasm
+          if-no-files-found: error
+          retention-days: 14
