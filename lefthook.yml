@@ -1,98 +1,47 @@
-# aozora-obsidian — strict lefthook hooks.
+# Pre-commit / pre-push hooks — every command runs inside the dev /
+# ci container through `just`, never directly on the host. Mirrors
+# the sibling aozora repo's policy (ADR-0002 / Docker-first).
 #
-# Pure JS / TS project. All hooks call `bun`, `biome`, `tsc`, `typos`
-# directly — they're managed by mise on the host (see
-# `~/.config/mise/config.toml`).
-#
-# Enable after clone:  `lefthook install`
+# Enable after clone:  `just hooks` (= `lefthook install`)
 # Disable:             `lefthook uninstall`
 #
 # Reference: https://lefthook.dev/configuration/
 
 pre-commit:
-  parallel: true
+  parallel: false
   skip:
     - rebase
     - merge
   commands:
-    # Biome (lint + format + organize-imports). `bun run check:fix`
-    # writes; we re-stage the fix so the commit carries it.
-    biome:
-      glob: "{src,scripts}/**/*.{ts,tsx,js,mjs,cjs,json,jsonc}"
-      run: bun run check:fix
+    # `bun run check:fix` — biome (lint + format + organize-imports)
+    # then tsc --noEmit. Writes are auto-staged so the commit carries
+    # the format pass.
+    check:
+      glob: "{src,scripts,tests}/**/*.{ts,tsx,js,mjs,cjs,json,jsonc}"
+      run: just fix
       stage_fixed: true
-    # tsc strict pass — catches type errors that biome can't see.
-    typecheck:
-      glob: "{src,scripts}/**/*.{ts,tsx}"
-      run: bun run typecheck
-    # Spell check. Dictionary lives in `_typos.toml`.
-    typos:
-      run: typos
-    # Manifest schema check — catches manifest.json regressions early.
-    manifest:
-      glob: "manifest.json"
-      run: bun run validate-manifest
 
 commit-msg:
   commands:
     # Conventional Commits — type required, scope optional, breaking-`!`
-    # optional. Allowed scopes per CONTRIBUTING.md: processor,
-    # livepreview, settings, wasm, styles, manifest, docs, ci.
+    # optional. Allowed scopes: processor, livepreview, settings, wasm,
+    # styles, manifest, docs, ci, build (see CONTRIBUTING.md).
     conventional:
       run: |
         grep -qE '^(feat|fix|docs|style|refactor|perf|test|build|ci|chore|revert)(\(.+\))?!?: .{1,}' {1} \
           || { echo 'Commit message must follow Conventional Commits (https://www.conventionalcommits.org/)'; exit 1; }
 
 pre-push:
-  parallel: true
+  parallel: false
   skip:
     - rebase
   commands:
-    # No-write checks. Every one is a hard gate.
-    biome-check:
-      run: bun run lint
-    typecheck:
-      run: bun run typecheck
-    typos:
-      run: typos
-    manifest:
-      run: bun run validate-manifest
-    # Full production build. Catches esbuild-time regressions that
-    # tsc / biome miss (CommonJS interop, external module names, …).
-    build:
-      run: node esbuild.config.mjs production
-    # Bundle size budget. Warns above 2 MiB for the combined
-    # main.js + aozora.wasm payload — ADR-0001 calls out 1-2 MiB
-    # compressed as the expected envelope. The check is non-fatal at
-    # the warn threshold; flip AOZORA_BUNDLE_HARD_FAIL=1 in CI to
-    # promote it to an error.
-    bundle-budget:
-      run: |
-        BUDGET=$((2 * 1024 * 1024))
-        TOTAL=0
-        for f in main.js aozora.wasm; do
-          if [ -f "$f" ]; then
-            BYTES=$(stat -c %s "$f")
-            TOTAL=$((TOTAL + BYTES))
-            echo "  $f: $BYTES bytes"
-          fi
-        done
-        echo "Total bundle: $TOTAL bytes (budget $BUDGET bytes)"
-        if [ "$TOTAL" -gt "$BUDGET" ]; then
-          echo "WARNING: bundle exceeds 2 MiB budget"
-          if [ "${AOZORA_BUNDLE_HARD_FAIL:-0}" = "1" ]; then
-            exit 1
-          fi
-        fi
-
-post-merge:
-  commands:
-    bun-install-warm:
-      glob: "{package.json,bun.lock,bun.lockb}"
-      run: bun install --frozen-lockfile || true
-
-post-checkout:
-  commands:
-    bun-install-warm:
-      glob: "{package.json,bun.lock,bun.lockb}"
-      run: bun install --frozen-lockfile || true
+    # `just ci` runs the full pipeline:
+    #   - biome + tsc (no writes)
+    #   - rebuild aozora.wasm via Docker
+    #   - vitest with C1 100% coverage gate
+    #   - production esbuild + check-wasm hard-fail
+    # Single hook so the docker compose container is reused across
+    # phases instead of spinning up four times.
+    ci:
+      run: just ci

@@ -1,0 +1,22 @@
+# Build outputs (generated inside the container; bind-mounted back).
+node_modules
+main.js
+main.js.map
+aozora.wasm
+pkg
+coverage
+dist
+
+# Editor / OS noise.
+.DS_Store
+.idea
+.vscode
+*.swp
+
+# Git internals — the wasm-builder stage doesn't need git history,
+# and shipping `.git` into every BuildKit context blows the cache.
+.git
+.github
+
+# Rust target dir (we never run cargo on the host; the toolchain lives in the wasm-builder stage).
+target

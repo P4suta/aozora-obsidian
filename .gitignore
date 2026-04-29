@@ -4,6 +4,12 @@ main.js.map
 *.tsbuildinfo
 dist/
 
+# Generated wasm-bindgen JS glue + .d.ts. `just wasm` writes pkg/
+# from the sibling aozora repo; package.json's `"aozora-wasm":
+# "file:./pkg"` resolves against it. Same lifecycle as aozora.wasm
+# below — rebuild on demand, never commit.
+pkg/
+
 # WASM artefact — produced by the upstream `aozora-wasm` crate's
 # `wasm-pack build --target web`. Treated as a vendored binary in
 # release tags rather than committed to main. ADR-0001.

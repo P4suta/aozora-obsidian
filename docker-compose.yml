@@ -1,0 +1,112 @@
+# aozora-obsidian compose file. Every `just` target runs a service here.
+#
+# Services:
+#   dev   — interactive development (VS Code Dev Containers attaches here)
+#   ci    — production build + typecheck + test gate (mirrors GitHub Actions)
+#   wasm  — produces aozora.wasm from the sibling aozora repo via wasm-pack
+#           + a fresh binaryen wasm-opt
+#
+# `additional_contexts` requires Docker Compose v2.20+ (BuildKit feature).
+
+name: aozora-obsidian
+
+x-common-env: &common-env
+  TERM: ${TERM:-xterm-256color}
+  # Bind-mounted /workspace is owned by the host UID; root inside the
+  # container would otherwise hit "dubious ownership" on every git
+  # invocation. Whitelist via the GIT_CONFIG_* triplet rather than
+  # baking a `git config` into the image.
+  GIT_CONFIG_COUNT: "1"
+  GIT_CONFIG_KEY_0: safe.directory
+  GIT_CONFIG_VALUE_0: /workspace
+
+services:
+  dev:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: dev
+      additional_contexts:
+        aozora: ../aozora
+    image: aozora-obsidian-dev:local
+    working_dir: /workspace
+    environment: *common-env
+    volumes:
+      - .:/workspace:cached
+      # node_modules is intentionally a named volume (overlays the
+      # bind mount) — host platforms differ from the Linux x86_64
+      # container, so binary deps such as esbuild's optional native
+      # variants must NOT leak across host / container.
+      - node-modules:/workspace/node_modules
+      - bun-cache:/root/.bun
+    init: true
+    tty: true
+    stdin_open: true
+
+  ci:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: ci
+      additional_contexts:
+        aozora: ../aozora
+    image: aozora-obsidian-ci:local
+    working_dir: /workspace
+    environment:
+      <<: *common-env
+      CI: "true"
+      AOZORA_WASM_REQUIRED: "1"
+    volumes:
+      - .:/workspace:cached
+      - node-modules:/workspace/node_modules
+      - bun-cache:/root/.bun
+
+  wasm:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: wasm-toolchain
+      additional_contexts:
+        aozora: ../aozora
+    image: aozora-obsidian-wasm:local
+    environment: *common-env
+    volumes:
+      # The sibling aozora repo is bind-mounted RW so wasm-pack can
+      # write into pkg/. target/ and pkg/ are redirected onto named
+      # volumes so the host aozora repo stays clean across builds.
+      - ../aozora:/aozora
+      - .:/workspace:cached
+      - cargo-registry:/usr/local/cargo/registry
+      - cargo-target:/aozora/target
+      - wasm-pack-pkg:/aozora/crates/aozora-wasm/pkg
+    working_dir: /aozora
+    command:
+      - bash
+      - -euo
+      - pipefail
+      - -c
+      - |
+        wasm-pack build --target web --release crates/aozora-wasm
+        # `--all-features` enables every WebAssembly proposal that
+        # current binaryen knows about (bulk-memory, sign-ext,
+        # nontrapping-fptoint, mutable-globals, multivalue, …).
+        # Rust 1.95 emits sign-ext + bulk-memory by default; without
+        # this flag wasm-opt rejects the input as "all used features
+        # should be allowed".
+        wasm-opt -O3 --all-features \
+          crates/aozora-wasm/pkg/aozora_wasm_bg.wasm \
+          -o /workspace/aozora.wasm
+        # Vendor the wasm-bindgen JS glue + .d.ts under
+        # /workspace/pkg so package.json's `"aozora-wasm":
+        # "file:./pkg"` dependency resolves at the same path on the
+        # host and in dev / ci containers.
+        rm -rf /workspace/pkg
+        cp -r crates/aozora-wasm/pkg /workspace/pkg
+        echo "aozora.wasm: $(stat -c %s /workspace/aozora.wasm) bytes"
+
+volumes:
+  node-modules:
+  bun-cache:
+  cargo-registry:
+  cargo-target:
+  wasm-pack-pkg:
