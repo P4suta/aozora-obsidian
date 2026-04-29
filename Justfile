@@ -29,22 +29,23 @@ wasm:
 # --- node_modules ------------------------------------------------------------
 
 # Install dependencies inside the dev container. Resolves
-# `aozora-wasm` against the host-built ./pkg directory; run
-# `just wasm` first so that path exists. Updates bun.lock as needed.
-install:
+# `aozora-wasm` against the host-built ./pkg directory, so we depend
+# on `wasm` to guarantee pkg/ exists before bun install runs.
+# Updates bun.lock as needed.
+install: wasm
     {{_dev}} bun install
 
 # Frozen-lockfile install (CI mode). Fails if bun.lock is stale.
 # Used by the GitHub Actions pipeline; locally prefer `just install`.
-install-frozen:
+install-frozen: wasm
     {{_ci}} bun install --frozen-lockfile
 
 # --- TypeScript / plugin build ------------------------------------------------
 
 # Production bundle (biome + tsc + esbuild + check-wasm hard-fail).
-# Depends on `wasm` (so aozora.wasm exists before check-wasm) and
-# `install` (so node_modules / aozora-wasm symlink is in place).
-build: wasm install
+# `install` transitively depends on `wasm`, so aozora.wasm + pkg/ are
+# both in place before check-wasm runs.
+build: install
     {{_ci}} bun run build
 
 # Watch-mode dev build (esbuild watch). Iterate on `src/` and reload

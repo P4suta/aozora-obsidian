@@ -12,12 +12,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout aozora-obsidian
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           path: aozora-obsidian
 
       - name: Checkout sibling aozora crate
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           repository: P4suta/aozora
           path: aozora
@@ -50,5 +50,5 @@ jobs:
     name: typos
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - uses: crate-ci/typos@v1

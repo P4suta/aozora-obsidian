@@ -3,7 +3,7 @@ import type { TFile, Vault } from "obsidian";
 import { decodeAozoraBytes } from "./encoding";
 import type { Encoding } from "./settings";
 
-const SOKOBON_MARKER = "底本：";
+const TEIHON_MARKER = "底本：";
 const SNIFF_BYTE_LIMIT = 4096;
 
 export type TxtDetectionReason = "header-marker" | "glob-match" | "no-match";
@@ -47,7 +47,7 @@ export async function detectAozoraTxt(
   const sliceLen = Math.min(SNIFF_BYTE_LIMIT, arrayBuffer.byteLength);
   const head = new Uint8Array(arrayBuffer, 0, sliceLen);
   const decoded = decodeAozoraBytes(head, deps.defaultEncoding);
-  if (decoded.text.includes(SOKOBON_MARKER)) {
+  if (decoded.text.includes(TEIHON_MARKER)) {
     return { isAozora: true, reason: "header-marker" };
   }
   return { isAozora: false, reason: "no-match" };
