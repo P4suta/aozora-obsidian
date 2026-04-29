@@ -14,12 +14,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout aozora-obsidian
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
         with:
           path: aozora-obsidian
 
       - name: Checkout sibling aozora crate
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
         with:
           repository: P4suta/aozora
           path: aozora
