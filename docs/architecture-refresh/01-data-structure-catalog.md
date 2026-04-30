@@ -169,9 +169,9 @@ Schema:
 | Persistent rope | adopted (CodeMirror native) | D3 | 0004 (planned) | `@codemirror/state` Text. |
 | Hash consing | hypothesis | D2, D3 | TBD | Phase 11. Bench gate: 1 MB source, ≥ 20% memory reduction. |
 | LRU cache (4 entries) + xxHash key | hypothesis | D3 | TBD | Phase 11. Bench gate: 5× re-parse cumulative ≥ 50% reduction. |
-| Patricia trie / radix tree | hypothesis | D4 | TBD | Phase 8. Required only if `aozora-encoding` doesn't already provide a glyph table. |
-| FST | hypothesis | D4 | TBD | Phase 8. ~100 KB target for JIS X 0213 mencode → Unicode mapping. |
-| Bloom filter | hypothesis | D4 | TBD | Phase 8. Early-exit before Patricia lookup. |
+| Patricia trie / radix tree | deferred (upstream-covered) | D4 | [0006](../adr/0006-gaiji-layer-defer-to-upstream.md) | Phase 8. `aozora-encoding` upstream already covers gaiji classification; TS-side mapping would duplicate. |
+| FST | deferred (upstream-covered) | D4 | [0006](../adr/0006-gaiji-layer-defer-to-upstream.md) | Same as Patricia. Re-evaluate via upstream `aozora-encoding` extension if bench shows the WASM round-trip dominates. |
+| Bloom filter | deferred (upstream-covered) | D4 | [0006](../adr/0006-gaiji-layer-defer-to-upstream.md) | Same; round-trip cost will be quantified by Phase 2's `nodes ${size}` bench. |
 | DAWG | rejected | D4 | TBD | FST is a strict generalisation. |
 | Cuckoo / Quotient filter | rejected | D4 | TBD | Bloom is sufficient at our scale. |
 | Persistent red-black tree | rejected | (general) | TBD | Lezer Tree's persistence subsumes. |
@@ -201,7 +201,7 @@ Schema:
 | HKT simulation (`fp-ts`) | rejected | (general) | TBD | Effect-ts subsumes. |
 | Refinement (`zod`) | adopted | D7 | TBD | Phase 1. Bundle-size gate ≤ +20 KB. |
 | `io-ts` | rejected | D7 | TBD | `zod` is the modern incumbent. |
-| Markov n-gram detector | hypothesis | D5 | TBD | Phase 9. Adopted only if BOM-less corpus run shows the current BOM-only path misclassifies. |
+| Markov n-gram detector | deferred (data gate) | D5 | [0007](../adr/0007-encoding-detector-defer-to-data.md) | Phase 9. Re-evaluation gated on a labelled BOM-less SJIS corpus from aozora.gr.jp; close gate if misclassification < 1%, else extend `aozora-encoding` upstream. |
 | Byte-pair frequency | rejected | D5 | TBD | Subsumed by Markov n-gram. |
 | Rabin-Karp | rejected | D1 | TBD | `aozora-scan` subsumes. |
 | xxHash | hypothesis | D3 | TBD | LRU key, hash-cons structural hash. Phase 11. |
