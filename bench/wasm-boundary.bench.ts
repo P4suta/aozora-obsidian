@@ -99,5 +99,26 @@ describe("wasm-boundary: parse + render (warm)", () => {
       },
       { iterations: tier.bytes >= 1_000_000 ? 30 : 100 },
     );
+
+    // Phase 2 (D layer): JSON wire from `Document::nodes_json` →
+    // zod-validated `AozoraNodeView[]` on the JS side. Baseline lets
+    // Phase 4 (Lezer Tree builder) see whether the JSON cross + zod
+    // parse cost is acceptable, or whether a structured serde-wasm-
+    // bindgen path becomes necessary.
+    bench(
+      `nodes ${tier.label}`,
+      async () => {
+        if (parser === undefined) {
+          parser = await makeReadyParser();
+        }
+        const doc = await parser.parse(source);
+        try {
+          doc.nodes();
+        } finally {
+          doc.dispose();
+        }
+      },
+      { iterations: tier.bytes >= 1_000_000 ? 30 : 100 },
+    );
   }
 });

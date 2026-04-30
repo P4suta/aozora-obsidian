@@ -16,6 +16,7 @@
 // plugin sees idiomatic TypeScript.
 
 import type { Document as RawDocument } from "aozora-wasm";
+import { type AozoraNodeView, AozoraNodeViewListSchema } from "./wasm/node-schema";
 
 /** Plugin-side projection of `aozora::Diagnostic`. camelCase. */
 interface AozoraDiagnostic {
@@ -106,6 +107,37 @@ export class AozoraDocumentHandle {
     } catch {
       return [];
     }
+  }
+
+  /**
+   * Classified Aozora-node spans, one entry per source-byte range.
+   *
+   * Wraps `Document::nodes_json` (Rust side, aozora workspace). The
+   * raw wire JSON is validated through `AozoraNodeViewListSchema`
+   * before reaching the plugin so a forward-compat upstream change
+   * surfaces as a `Result.err` rather than silent corruption.
+   *
+   * Phase 4 (Lezer Tree builder) and Phase 10 (in-line diagnostic
+   * decorator) consume this stream — see
+   * `docs/architecture-refresh/00-current-naive-points.md` §0.4
+   * for the upstream-vs-TS responsibility split.
+   *
+   * Returns the empty list when the wire JSON is unparseable; a
+   * future Phase 7 promotion will return `Result<readonly
+   * AozoraNodeView[], NodeStreamError>` once the Effect layer
+   * lands.
+   */
+  nodes(): readonly AozoraNodeView[] {
+    this.assertLive();
+    const json = this.inner.nodes_json();
+    let raw: unknown;
+    try {
+      raw = JSON.parse(json);
+    } catch {
+      return [];
+    }
+    const parsed = AozoraNodeViewListSchema.safeParse(raw);
+    return parsed.success ? parsed.data : [];
   }
 
   sourceByteLen(): number {

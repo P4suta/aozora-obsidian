@@ -6,12 +6,14 @@ function fakeDocument(opts: {
   html?: string;
   serialized?: string;
   diagnostics?: string;
+  nodes?: string;
   byteLen?: number;
 }): RawDocument {
   return {
     to_html: () => opts.html ?? "<p></p>",
     serialize: () => opts.serialized ?? "",
     diagnostics_json: () => opts.diagnostics ?? "[]",
+    nodes_json: () => opts.nodes ?? "[]",
     source_byte_len: () => opts.byteLen ?? 0,
     free: () => {},
     [Symbol.dispose]: () => {},
@@ -96,6 +98,52 @@ describe("AozoraDocumentHandle", () => {
     });
   });
 
+  describe("nodes", () => {
+    it("parses a valid nodes_json into typed AozoraNodeView entries", () => {
+      const json = JSON.stringify([
+        { kind: "ruby", start: 0, end: 12 },
+        { kind: "bouten", start: 12, end: 18 },
+        { kind: "containerOpen", start: 30, end: 36 },
+      ]);
+      const handle = new AozoraDocumentHandle(fakeDocument({ nodes: json }));
+      const nodes = handle.nodes();
+      expect(nodes).toHaveLength(3);
+      expect(nodes[0]).toEqual({ kind: "ruby", start: 0, end: 12 });
+      expect(nodes[2]?.kind).toBe("containerOpen");
+    });
+
+    it("returns the empty list for plain text (`[]`)", () => {
+      const handle = new AozoraDocumentHandle(fakeDocument({ nodes: "[]" }));
+      expect(handle.nodes()).toEqual([]);
+    });
+
+    it("returns empty list when nodes_json is malformed JSON", () => {
+      const handle = new AozoraDocumentHandle(fakeDocument({ nodes: "{not json" }));
+      expect(handle.nodes()).toEqual([]);
+    });
+
+    it("returns empty list when nodes_json wire shape rejects schema", () => {
+      // Top-level value isn't an array.
+      const handle = new AozoraDocumentHandle(fakeDocument({ nodes: '{"foo":1}' }));
+      expect(handle.nodes()).toEqual([]);
+    });
+
+    it("returns empty list when an entry carries an unrecognised kind", () => {
+      // The schema enumerates 20 kinds (19 from the Rust side + 'unknown'
+      // fall-through). A genuinely-novel kind makes the whole list reject;
+      // forward-compat happens upstream via the 'unknown' tag.
+      const json = JSON.stringify([{ kind: "novel-future", start: 0, end: 1 }]);
+      const handle = new AozoraDocumentHandle(fakeDocument({ nodes: json }));
+      expect(handle.nodes()).toEqual([]);
+    });
+
+    it("rejects entries with negative offsets", () => {
+      const json = JSON.stringify([{ kind: "ruby", start: -1, end: 5 }]);
+      const handle = new AozoraDocumentHandle(fakeDocument({ nodes: json }));
+      expect(handle.nodes()).toEqual([]);
+    });
+  });
+
   it("calls inner.free exactly once across multiple disposes", () => {
     const free = vi.fn();
     const inner = fakeDocument({});
@@ -112,6 +160,7 @@ describe("AozoraDocumentHandle", () => {
     expect(() => handle.toHtml()).toThrow(/disposed/);
     expect(() => handle.serialize()).toThrow(/disposed/);
     expect(() => handle.diagnostics()).toThrow(/disposed/);
+    expect(() => handle.nodes()).toThrow(/disposed/);
     expect(() => handle.sourceByteLen()).toThrow(/disposed/);
   });
 });
