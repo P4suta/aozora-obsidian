@@ -15,8 +15,8 @@
 //   1 — last-run.json missing (run `just bench` first)
 //   2 — baseline.json missing or malformed
 
-import { readFileSync, existsSync } from "node:fs";
-import { resolve, dirname } from "node:path";
+import { existsSync, readFileSync } from "node:fs";
+import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const PROJECT_ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
@@ -66,9 +66,7 @@ let neutral = 0;
 for (const [name, entry] of Object.entries(lastByName)) {
   const base = baselineByName[name];
   if (base === undefined) {
-    lines.push(
-      `| ${name} | _new_ | ${formatMean(entry.mean)} | — | ${formatHz(entry.hz)} | 🆕 |`,
-    );
+    lines.push(`| ${name} | _new_ | ${formatMean(entry.mean)} | — | ${formatHz(entry.hz)} | 🆕 |`);
     continue;
   }
   const delta = (entry.mean - base.mean) / base.mean;
@@ -89,7 +87,9 @@ for (const [name, entry] of Object.entries(lastByName)) {
 
 const removed = Object.keys(baselineByName).filter((n) => !(n in lastByName));
 for (const name of removed) {
-  lines.push(`| ${name} | ${formatMean(baselineByName[name].mean)} | _missing_ | — | — | ⚠️ removed |`);
+  lines.push(
+    `| ${name} | ${formatMean(baselineByName[name].mean)} | _missing_ | — | — | ⚠️ removed |`,
+  );
 }
 
 lines.push(
@@ -133,16 +133,28 @@ function flattenBenches(report) {
 }
 
 function formatMean(ns) {
-  if (ns === undefined || ns === null) return "—";
-  if (ns >= 1_000_000) return `${(ns / 1_000_000).toFixed(2)}ms`;
-  if (ns >= 1_000) return `${(ns / 1_000).toFixed(2)}µs`;
+  if (ns === undefined || ns === null) {
+    return "—";
+  }
+  if (ns >= 1_000_000) {
+    return `${(ns / 1_000_000).toFixed(2)}ms`;
+  }
+  if (ns >= 1_000) {
+    return `${(ns / 1_000).toFixed(2)}µs`;
+  }
   return `${ns.toFixed(0)}ns`;
 }
 
 function formatHz(hz) {
-  if (hz === undefined || hz === null) return "—";
-  if (hz >= 1_000_000) return `${(hz / 1_000_000).toFixed(2)}M`;
-  if (hz >= 1_000) return `${(hz / 1_000).toFixed(2)}k`;
+  if (hz === undefined || hz === null) {
+    return "—";
+  }
+  if (hz >= 1_000_000) {
+    return `${(hz / 1_000_000).toFixed(2)}M`;
+  }
+  if (hz >= 1_000) {
+    return `${(hz / 1_000).toFixed(2)}k`;
+  }
   return hz.toFixed(0);
 }
 

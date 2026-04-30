@@ -15,13 +15,10 @@
 // convert to camelCase here at the boundary so the rest of the
 // plugin sees idiomatic TypeScript.
 
-export type { InitInput, InitOutput } from "aozora-wasm";
-export { Document, default as init } from "aozora-wasm";
-
 import type { Document as RawDocument } from "aozora-wasm";
 
 /** Plugin-side projection of `aozora::Diagnostic`. camelCase. */
-export interface AozoraDiagnostic {
+interface AozoraDiagnostic {
   readonly kind:
     | "source_contains_pua"
     | "unclosed_bracket"

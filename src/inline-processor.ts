@@ -22,7 +22,7 @@ const SENTINEL_PATTERN = /[｜《※]|［＃|〔/u;
 const TARGETED_BLOCK_SELECTOR = "p, li, blockquote, h1, h2, h3, h4, h5, h6, td, th";
 const OUTER_PARAGRAPH_PATTERN = /^<p>([\s\S]*)<\/p>$/;
 
-export interface AozoraInlineDeps {
+interface AozoraInlineDeps {
   readonly parser: AozoraParser;
 }
 

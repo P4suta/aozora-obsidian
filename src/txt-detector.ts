@@ -6,9 +6,9 @@ import type { Encoding } from "./settings";
 const TEIHON_MARKER = "底本：";
 const SNIFF_BYTE_LIMIT = 4096;
 
-export type TxtDetectionReason = "header-marker" | "glob-match" | "no-match";
+type TxtDetectionReason = "header-marker" | "glob-match" | "no-match";
 
-export interface TxtDetectionResult {
+interface TxtDetectionResult {
   readonly isAozora: boolean;
   readonly reason: TxtDetectionReason;
 }

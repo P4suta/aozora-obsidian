@@ -75,6 +75,19 @@ bench-compare: install
 check: install
     {{_ci}} bun run check
 
+# Full discipline gate: biome + tsc + knip + type-coverage.
+# Strictly stronger than `check`; use this in CI and pre-push hooks.
+# See docs/adr/0003-architecture-refresh-bench-first.md §3 for the
+# rationale (no proliferation, no rotted exports, no untyped any).
+# publint is intentionally NOT included — aozora-obsidian is a
+# private Obsidian plugin distributed as a GitHub-release zip
+# (main.js + manifest.json + styles.css + aozora.wasm), not an npm
+# package; publint's --strict checks target a publishing model the
+# project doesn't follow. Obsidian-manifest discipline is handled
+# separately by `bun run validate-manifest` (lefthook pre-commit).
+discipline: install
+    {{_ci}} bun run discipline
+
 # biome check --write + tsc --noEmit.
 fix: install
     {{_dev}} bun run check:fix
@@ -104,7 +117,10 @@ hooks-uninstall:
 # --- aggregate ----------------------------------------------------------------
 
 # Local replica of the CI pipeline. Run before pushing.
-ci: check wasm test build
+# `discipline` subsumes `check` (biome + tsc) and adds knip +
+# type-coverage so CI catches unused exports / files / dependencies
+# and any-type leakage on the same pass.
+ci: discipline wasm test build
 
 # --- cleanup ------------------------------------------------------------------
 

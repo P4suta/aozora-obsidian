@@ -37,26 +37,30 @@ pre-commit:
 
 commit-msg:
   commands:
-    # Conventional Commits — type required, scope optional, breaking-`!`
-    # optional. Allowed scopes: processor, livepreview, settings, wasm,
-    # styles, manifest, docs, ci, build, infra, deps (see CONTRIBUTING.md).
+    # Structured Conventional Commits via @commitlint/cli with the
+    # config in commitlint.config.mjs (extends config-conventional +
+    # repo-specific scope-enum). Failures point at the offending
+    # field (type/scope/subject) rather than a single regex hit.
+    # The host-side path runs against a docker compose dev container
+    # so the same config gates locally and in CI.
     conventional:
-      run: |
-        grep -qE '^(feat|fix|docs|style|refactor|perf|test|build|ci|chore|revert)(\(.+\))?!?: .{1,}' {1} \
-          || { echo 'Commit message must follow Conventional Commits (https://www.conventionalcommits.org/)'; exit 1; }
+      run: docker compose run --rm --no-TTY dev bun run commitlint --edit {1}
 
 pre-push:
   parallel: false
   skip:
     - rebase
   commands:
-    # `just ci` runs the full pipeline:
+    # `just ci` runs the full pipeline (Phase -1.5: now includes the
+    # discipline gate = biome + tsc + knip + type-coverage):
     #   - biome + tsc (no writes)
+    #   - knip (unused exports/files/dependencies)
+    #   - type-coverage --strict --at-least 99 (no implicit any)
     #   - rebuild aozora.wasm via Docker
     #   - vitest with C1 100% coverage gate
     #   - production esbuild + check-wasm hard-fail
     # Single hook so the docker compose container is reused across
-    # phases instead of spinning up four times.
+    # phases instead of spinning up five times.
     ci:
       run: just ci
 

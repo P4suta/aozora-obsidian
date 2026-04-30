@@ -22,7 +22,7 @@ const UTF8_BOM = [0xef, 0xbb, 0xbf] as const;
 const UTF16_LE_BOM = [0xff, 0xfe] as const;
 const UTF16_BE_BOM = [0xfe, 0xff] as const;
 
-export interface DecodeResult {
+interface DecodeResult {
   readonly text: string;
   readonly encoding: Encoding;
   /** True if a Byte Order Mark drove the encoding choice. */

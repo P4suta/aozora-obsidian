@@ -15,10 +15,27 @@
     "format:check": "biome format .",
     "check": "biome check . && tsc --noEmit",
     "check:fix": "biome check --write . && tsc --noEmit",
+    "discipline": "bun run check && bun run lint:knip && bun run lint:typecov",
     "validate-manifest": "node scripts/validate-manifest.mjs",
     "test": "vitest run --coverage",
     "bench": "vitest bench --run",
-    "bench:compare": "node scripts/bench-compare.mjs"
+    "bench:compare": "node scripts/bench-compare.mjs",
+    "lint:knip": "knip --no-progress",
+    "lint:typecov": "type-coverage --detail --strict --at-least 99",
+    "lint:commit": "commitlint --from=HEAD~1 --to=HEAD --verbose"
+  },
+  "engines": {
+    "node": ">=22.0.0",
+    "bun": ">=1.2.0"
+  },
+  "packageManager": "bun@1.2.23",
+  "typeCoverage": {
+    "atLeast": 99,
+    "strict": true,
+    "ignoreCatch": false,
+    "ignoreFiles": [
+      "tests/__mocks__/obsidian.ts"
+    ]
   },
   "keywords": [
     "obsidian",
@@ -45,12 +62,16 @@
     "@biomejs/biome": "^2.4.13",
     "@codemirror/state": "^6.6.0",
     "@codemirror/view": "^6.41.1",
+    "@commitlint/cli": "^20.5.2",
+    "@commitlint/config-conventional": "^20.5.0",
+    "@total-typescript/ts-reset": "^0.6.1",
     "@types/node": "^25.6.0",
     "@vitest/coverage-istanbul": "^4.1.5",
     "esbuild": "^0.28.0",
-    "fast-check": "^4.7.0",
     "happy-dom": "^20.9.0",
+    "knip": "^6.9.0",
     "obsidian": "^1.12.3",
+    "type-coverage": "^2.29.7",
     "typescript": "^6.0.3",
     "vitest": "^4.1.5"
   }

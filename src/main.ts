@@ -1,3 +1,9 @@
+// `@total-typescript/ts-reset` sharpens the global TypeScript stdlib
+// (JSON.parse → unknown, Array.isArray narrows correctly, .filter(Boolean)
+// removes nullish, etc.). Imported once at the plugin entry per the
+// project's discipline gate (Phase -1.5, ADR 0003).
+import "@total-typescript/ts-reset";
+
 import { Compartment, type Extension } from "@codemirror/state";
 import { type App, Plugin } from "obsidian";
 import { createAozoraInlineProcessor } from "./inline-processor";

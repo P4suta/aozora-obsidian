@@ -32,7 +32,8 @@
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
     "allowSyntheticDefaultImports": true,
-    "resolveJsonModule": true
+    "resolveJsonModule": true,
+    "types": ["node"]
   },
   "include": ["src/**/*.ts", "scripts/**/*.mjs", "bench/**/*.ts"],
   "exclude": ["node_modules", "tests", "main.js", "dist"]

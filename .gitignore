@@ -37,6 +37,9 @@ Thumbs.db
 .env
 .env.local
 
+# Claude Code session state (per-clone, never committed)
+.claude/
+
 # Test artefacts
 coverage/
 .tmp-*

@@ -28,7 +28,7 @@ import type { AozoraParser } from "./wasm-loader";
  *     on every invocation; the host `main.ts` triggers a preview
  *     rerender so toggles take effect immediately.
  */
-export interface AozoraProcessorDeps {
+interface AozoraProcessorDeps {
   readonly parser: AozoraParser;
   readonly getSettings: () => AozoraSettings;
 }
