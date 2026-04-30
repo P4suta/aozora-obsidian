@@ -52,6 +52,30 @@ jobs:
           if-no-files-found: error
           retention-days: 14
 
+      # bench is warn-only on shared GitHub runners — variance on
+      # ubuntu-latest is too noisy for hard-fail thresholds. Numbers
+      # are uploaded as a workflow artefact so trends can be reviewed
+      # via `gh run download` and compared against bench/baseline.json.
+      # Hard-fail graduation is roadmap "Now (v0.1.x)" after ≥30 days
+      # of baseline data has accumulated. See bench/README.md and
+      # docs/adr/0003-architecture-refresh-bench-first.md.
+      - name: Run bench harness (warn-only)
+        if: always()
+        working-directory: aozora-obsidian
+        continue-on-error: true
+        run: just bench
+
+      - name: Upload bench results
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: aozora-obsidian-bench
+          path: |
+            aozora-obsidian/bench/last-run.json
+            aozora-obsidian/bench/baseline.json
+          if-no-files-found: warn
+          retention-days: 30
+
   typos:
     name: typos
     runs-on: ubuntu-latest
