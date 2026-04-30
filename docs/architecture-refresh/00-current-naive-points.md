@@ -172,8 +172,27 @@ aozora-obsidian 側に欠けているのは:
 
 ## 0.7 残作業
 
-- [ ] 本ドキュメントを Plan ファイルに反映(Plan の Phase 構造を bench-first + reuse-first に書き換え)
-- [ ] Phase -1 として bench 基盤整備を追加(タスク化)
-- [ ] Phase 2 を「aozora-scan 直接利用」に差替え(タスク更新)
-- [ ] `docs/architecture-refresh/01-data-structure-catalog.md` のスケルトン作成
-- [ ] `docs/adr/0003-architecture-refresh-bench-first.md` の起草
+すべて完了:
+
+- [x] Plan ファイル更新(bench-first / reuse-first / systemise 規律)
+- [x] Phase -1 bench 基盤整備 → `bench/{wasm-boundary, lezer-tree}.bench.ts`, `scripts/bench-compare.mjs`, `bench/baseline.json`
+- [x] Phase 2 を `Document::nodes_json` + `aozora-scan` 直接利用に差替え → ADR 0004
+- [x] 永続化されたカタログ: `01-data-structure-catalog.md`
+- [x] ADR 連番:
+  - [0003 — bench-first discipline](../adr/0003-architecture-refresh-bench-first.md)
+  - [0004 — aozora-scan as upstream lexer](../adr/0004-aozora-scan-as-upstream-lexer.md)
+  - [0005 — reject effect-ts; augment hand-rolled Result](../adr/0005-effect-layer-handrolled-result.md)
+  - [0006 — defer gaiji layer to upstream](../adr/0006-gaiji-layer-defer-to-upstream.md)
+  - [0007 — defer encoding detector to corpus data](../adr/0007-encoding-detector-defer-to-data.md)
+  - [0008 — defer WASM section split](../adr/0008-bundle-defer-section-split.md)
+  - [0009 — test discipline review](../adr/0009-test-discipline-review.md)
+- [x] レイヤー設計図: [02-layer-design.md](./02-layer-design.md)
+- [x] 拒否 / 延期登録: [03-tradeoffs.md](./03-tradeoffs.md)
+- [x] Bench 運用ガイド: [04-bench-operations.md](./04-bench-operations.md)
+
+ラウンド外(release-prep ラウンドへ):
+
+- [ ] Plugin lifecycle 統合(Phase 5 LanguageSupport + Phase 6 reactive store の `main.ts` への結線)
+- [ ] iOS / Android 実機 QA
+- [ ] Marketplace 申請(`aozora-pin.txt`、CHANGELOG split、GitHub Release zip)
+- [ ] 日本語 README / デモ vault / getting-started 動線
