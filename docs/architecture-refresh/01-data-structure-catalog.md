@@ -205,9 +205,9 @@ Schema:
 | Byte-pair frequency | rejected | D5 | TBD | Subsumed by Markov n-gram. |
 | Rabin-Karp | rejected | D1 | TBD | `aozora-scan` subsumes. |
 | xxHash | hypothesis | D3 | TBD | LRU key, hash-cons structural hash. Phase 11. |
-| WASM section split + lazy load | hypothesis | D4, L | TBD | Phase 12. Trigger: `aozora.wasm` total > 1.5 MiB. Currently 961 KB so deferred until gaiji / encoding additions push it over. |
-| WASM SIMD (opt-in) | hypothesis | D1 | TBD | Phase 12. Already enabled in `aozora-scan` Teddy backend; gate is whether opt-in compile flag adds bundle without practical benefit on iOS WebKit. |
-| `wasm-opt -Oz` | hypothesis | (size) | TBD | Phase 12. Apply per-section based on bench. |
+| WASM section split + lazy load | deferred (no pressure) | D4, L | [0008](../adr/0008-bundle-defer-section-split.md) | Current bundle ~1.05 MiB ≪ 2 MiB cap; Phase 8 / 9 deferrals mean no new growth. Revisit if total > 1.5 MiB or mobile init > 500 ms. |
+| WASM SIMD (opt-in) | adopted (upstream) | D1 | [0008](../adr/0008-bundle-defer-section-split.md) | `aozora-scan` already enables `simd128` automatically when `wasm-pack` builds with the feature; nothing for aozora-obsidian to flip. |
+| `wasm-opt -Oz` | deferred (no pressure) | (size) | [0008](../adr/0008-bundle-defer-section-split.md) | Same bundle-headroom argument; uniform `-O3` is fine until size budget tightens. |
 | WASM tail call | deferred | — | — | Stage 4 but Capacitor WebView support uneven. |
 | WASM Component model | rejected | — | TBD | Ecosystem too early. |
 | Knuth-Plass linebreaking | rejected | typography | TBD | CSS `text-wrap: balance` covers. |
