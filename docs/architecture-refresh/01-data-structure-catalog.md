@@ -216,12 +216,12 @@ Schema:
 | Variable fonts (vert/vrt2 axes) | adopted | typography | TBD | Phase 13. CSS `font-feature-settings` already used; variable axis declaration is a config tightening. |
 | Bidi algorithm | rejected | typography | TBD | Out of scope; CSS handles vert/horiz mix. |
 | OpenType GSUB/GPOS | rejected | typography | TBD | Out of scope; rely on browser+font support. |
-| Property-based testing (`fast-check`) | deferred | (test) | — | Removed from devDeps in build(deps) commit; Phase 1 re-adds when first property test lands. Avoids the rotted-dep state. |
-| Mutation testing (`@stryker-mutator/core`) | hypothesis | (test) | TBD | Local-only run; CI inclusion gated by ADR after scoring run. |
-| Cargo fuzz | adopted (upstream) | (test) | — | Already in `aozora-lex/fuzz`; aozora-obsidian inherits via WASM. |
-| Snapshot testing | adopted | (test) | — | Vitest built-in; used by Reading-view post-processor tests. |
-| Metamorphic testing | hypothesis | (test) | TBD | Phase 4 introduces `parse∘serialize∘parse` invariant. |
-| Differential testing (vs `aozora-tools` LSP formatter) | hypothesis | (test) | TBD | Phase 14. Output comparison only — no code dependency on `aozora-tools`. |
+| Property-based testing (`fast-check`) | adopted | (test) | [0009](../adr/0009-test-discipline-review.md) | Re-added in Phase 1; per-phase property tests across types, schema, lezer, reactivity, diagnostics, cache, typography. |
+| Mutation testing (`@stryker-mutator/core`) | deferred (cost gate) | (test) | [0009](../adr/0009-test-discipline-review.md) | C1 100% + fast-check property tests close most of the mutation-score gap; revisit when CI budget can absorb a +10-minute step. |
+| Cargo fuzz | adopted (upstream) | (test) | [0009](../adr/0009-test-discipline-review.md) | Already in `aozora-lex/fuzz`; aozora-obsidian inherits via WASM. |
+| Snapshot testing | adopted | (test) | [0009](../adr/0009-test-discipline-review.md) | Vitest built-in; used by Reading-view post-processor tests. |
+| Metamorphic testing | adopted (selectively) | (test) | [0009](../adr/0009-test-discipline-review.md) | Round-trip invariants in Phase 1 (`parseStoredSettings`) + Phase 4 (lezer order). The Aozora parser-side `parse∘serialize∘parse` invariant is upstream's `aozora-lex/tests/property_borrowed_arena.rs`. |
+| Differential testing (vs `aozora-tools` LSP formatter) | deferred (cross-repo) | (test) | [0009](../adr/0009-test-discipline-review.md) | Cross-repo coordination cost outweighs current need; revisit when a release-prep round surfaces a divergence to investigate. |
 | Concolic testing | rejected | (test) | TBD | Property + fuzz suffice. |
 | @total-typescript/ts-reset | adopted | (lint) | — | Phase -1.5 build(deps) commit. Side-effect import in `src/main.ts`. |
 | knip | adopted | (lint) | — | Phase -1.5. CI/lefthook gate. |
