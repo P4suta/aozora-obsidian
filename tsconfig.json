@@ -34,6 +34,6 @@
     "allowSyntheticDefaultImports": true,
     "resolveJsonModule": true
   },
-  "include": ["src/**/*.ts", "scripts/**/*.mjs"],
+  "include": ["src/**/*.ts", "scripts/**/*.mjs", "bench/**/*.ts"],
   "exclude": ["node_modules", "tests", "main.js", "dist"]
 }

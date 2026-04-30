@@ -16,7 +16,9 @@
     "check": "biome check . && tsc --noEmit",
     "check:fix": "biome check --write . && tsc --noEmit",
     "validate-manifest": "node scripts/validate-manifest.mjs",
-    "test": "vitest run --coverage"
+    "test": "vitest run --coverage",
+    "bench": "vitest bench --run",
+    "bench:compare": "node scripts/bench-compare.mjs"
   },
   "keywords": [
     "obsidian",

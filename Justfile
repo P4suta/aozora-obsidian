@@ -57,6 +57,20 @@ dev: install
 test: install
     {{_ci}} bun run test
 
+# Bench harness (vitest bench). Runs every `bench/*.bench.ts` and
+# writes `bench/last-run.json`. Compare against `bench/baseline.json`
+# with `just bench-compare` to see deltas. See bench/README.md for
+# the update protocol — baseline is canonical and only bumped on
+# intentional renderer changes (aozora-pin.txt SHA bump).
+bench: install
+    {{_ci}} bun run bench
+
+# Diff bench/last-run.json against bench/baseline.json. Surfaces
+# any +/- 5% deltas as a markdown table. Read-only — does not
+# write to baseline.json.
+bench-compare: install
+    {{_ci}} bun run bench:compare
+
 # biome check + tsc --noEmit (no writes).
 check: install
     {{_ci}} bun run check

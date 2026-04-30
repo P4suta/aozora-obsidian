@@ -9,6 +9,16 @@ export default defineConfig({
     environment: "happy-dom",
     setupFiles: ["./tests/setup.ts"],
     include: ["tests/**/*.test.ts"],
+    // Bench harness lives next to tests but uses `bench()` instead of
+    // `test()` and is invoked via `vitest bench` (not `vitest run`).
+    // Listing it here lets `vitest bench --project ...` discover the
+    // files; coverage instrumentation skips it via the `include`
+    // glob below (`src/**` only).
+    benchmark: {
+      include: ["bench/**/*.bench.ts"],
+      reporters: ["default"],
+      outputJson: "./bench/last-run.json",
+    },
     coverage: {
       // istanbul provider — v8 needs `node:inspector` which Bun
       // doesn't implement yet (oven-sh/bun#2445). istanbul ships its

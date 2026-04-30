@@ -1,0 +1,7 @@
+{
+  "schema": 1,
+  "comment": "Canonical bench baseline. Updated only on intentional renderer/lexer changes that bump aozora-pin.txt. See bench/README.md for the update protocol. Empty until the first run.",
+  "generated_at": null,
+  "aozora_pin": null,
+  "results": []
+}
