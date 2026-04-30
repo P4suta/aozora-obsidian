@@ -1,6 +1,7 @@
 import * as fc from "fast-check";
 import { describe, expect, it } from "vitest";
 import {
+  all,
   andThen,
   err,
   fromThrowable,
@@ -10,6 +11,9 @@ import {
   mapErr,
   ok,
   type Result,
+  sequence,
+  tap,
+  tapErr,
   unwrapOr,
 } from "../../src/types/result";
 
@@ -155,6 +159,65 @@ describe("Result", () => {
           expect(r).toEqual(ok(n));
         }),
       );
+    });
+  });
+
+  describe("all / sequence", () => {
+    it("collects all OKs into a single OK of the array", () => {
+      fc.assert(
+        fc.property(fc.array(fc.integer()), (ns) => {
+          const results: Result<number, string>[] = ns.map(ok);
+          expect(all(results)).toEqual(ok(ns));
+        }),
+      );
+    });
+
+    it("short-circuits on the first ERR", () => {
+      const results: Result<number, string>[] = [ok(1), err("boom"), ok(3)];
+      expect(all(results)).toEqual(err("boom"));
+    });
+
+    it("returns ok([]) for the empty input", () => {
+      expect(all([])).toEqual(ok([]));
+    });
+
+    it("sequence is an alias for all", () => {
+      const results: Result<number, string>[] = [ok(1), ok(2)];
+      expect(sequence(results)).toEqual(all(results));
+    });
+  });
+
+  describe("tap / tapErr", () => {
+    it("tap runs the side effect on OK and returns the original Result", () => {
+      const seen: number[] = [];
+      const r: Result<number, string> = ok(7);
+      const out = tap(r, (n) => seen.push(n));
+      expect(out).toBe(r);
+      expect(seen).toEqual([7]);
+    });
+
+    it("tap is a no-op on ERR", () => {
+      const seen: number[] = [];
+      const r: Result<number, string> = err("boom");
+      const out = tap(r, (n) => seen.push(n));
+      expect(out).toBe(r);
+      expect(seen).toEqual([]);
+    });
+
+    it("tapErr runs the side effect on ERR and returns the original Result", () => {
+      const seen: string[] = [];
+      const r: Result<number, string> = err("boom");
+      const out = tapErr(r, (e) => seen.push(e));
+      expect(out).toBe(r);
+      expect(seen).toEqual(["boom"]);
+    });
+
+    it("tapErr is a no-op on OK", () => {
+      const seen: string[] = [];
+      const r: Result<number, string> = ok(7);
+      const out = tapErr(r, (e) => seen.push(e));
+      expect(out).toBe(r);
+      expect(seen).toEqual([]);
     });
   });
 });

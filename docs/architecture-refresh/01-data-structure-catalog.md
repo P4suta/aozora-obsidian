@@ -191,8 +191,8 @@ Schema:
 | Topological sort (settings deps) | hypothesis | D7 | TBD | Phase 6. Cycle detection at startup. |
 | Optics-ts (lenses) | hypothesis | D7 | TBD | Phase 6. Bundle-size gate ≤ +5 KB. |
 | Profunctor optics (advanced) | rejected | D7 | TBD | Excess for our nesting depth. |
-| Result / Either ADT | hypothesis | D8 | TBD | Phase 7. Hand-rolled if `effect-ts` rejected. |
-| Effect-ts (`effect`) | hypothesis | D8 | TBD | Phase 7. Bundle-size gate ≤ +50 KB; otherwise fall back to Result/Either. |
+| Result / Either ADT | adopted | D8 | [0005](../adr/0005-effect-layer-handrolled-result.md) | Phase 1 + Phase 7 augmentation (`all` / `sequence` / `tap` / `tapErr`). |
+| Effect-ts (`effect`) | rejected | D8 | [0005](../adr/0005-effect-layer-handrolled-result.md) | Phase 7. Bundle weight ≈ 80 KB gz; current code has no use surface beyond what `Result<T, E>` already covers. Re-evaluate when structured concurrency or layered DI becomes load-bearing. |
 | Algebraic effects (Eff/Koka) | rejected | D8 | TBD | Effect-ts subsumes. |
 | Free / IO monad | rejected | D8 | TBD | Effect-ts subsumes. |
 | GADT (discriminated union) | adopted | D2 | TBD | Phase 1 lands the Brand / Phantom / Result foundation. |

@@ -65,3 +65,52 @@ export function fromThrowable<T, E>(fn: () => T, coerce: (raw: unknown) => E): R
     return err(coerce(raw));
   }
 }
+
+/**
+ * Collect a homogeneous list of Results into a single Result of a
+ * list. The first `Err` short-circuits — subsequent `Result`s are
+ * not inspected. This is the standard `traverse` shape; alias as
+ * `sequence` for callers used to that name.
+ *
+ * Phase 7 added in lieu of effect-ts's `Effect.all` (rejected, see
+ * `docs/adr/0005-effect-layer-handrolled-result.md`).
+ */
+export function all<T, E>(results: readonly Result<T, E>[]): Result<readonly T[], E> {
+  const collected: T[] = [];
+  for (const r of results) {
+    if (!r.ok) {
+      return r;
+    }
+    collected.push(r.value);
+  }
+  return ok(collected);
+}
+
+/** Alias for `all` matching the traverse / sequence vocabulary. */
+export const sequence = all;
+
+/**
+ * Run a side-effect on the OK value without changing the Result.
+ * Returns the original `r`. Useful for telemetry, logging, or
+ * wiring incidental tasks (cache warming, metric tick) into a
+ * Result chain without breaking the value flow.
+ */
+export function tap<T, E>(r: Result<T, E>, f: (value: T) => void): Result<T, E> {
+  if (r.ok) {
+    f(r.value);
+  }
+  return r;
+}
+
+/**
+ * Symmetric `tap` on the ERR channel. The error is observed but the
+ * Result is unchanged. Common use: log a structured warning when
+ * the error path fires, while the caller still decides what to do
+ * with the failure.
+ */
+export function tapErr<T, E>(r: Result<T, E>, f: (error: E) => void): Result<T, E> {
+  if (!r.ok) {
+    f(r.error);
+  }
+  return r;
+}
