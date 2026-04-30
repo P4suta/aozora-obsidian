@@ -9,7 +9,8 @@ import { type App, Plugin } from "obsidian";
 import { createAozoraInlineProcessor } from "./inline-processor";
 import { aozoraLivePreviewExtension } from "./livepreview";
 import { createAozoraCodeBlockProcessor } from "./processor";
-import { type AozoraSettings, AozoraSettingTab, DEFAULT_SETTINGS } from "./settings";
+import { parseStoredSettings } from "./schema/settings";
+import { type AozoraSettings, AozoraSettingTab } from "./settings";
 import { AozoraParser } from "./wasm-loader";
 
 /**
@@ -80,8 +81,8 @@ export default class AozoraPlugin extends Plugin {
   }
 
   async loadSettings(): Promise<void> {
-    const stored = (await this.loadData()) as Partial<AozoraSettings> | null;
-    this.settings = { ...DEFAULT_SETTINGS, ...(stored ?? {}) };
+    const stored: unknown = await this.loadData();
+    this.settings = parseStoredSettings(stored);
   }
 
   async saveSettings(): Promise<void> {

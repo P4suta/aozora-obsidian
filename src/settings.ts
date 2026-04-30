@@ -1,27 +1,14 @@
 import { type App, PluginSettingTab, Setting } from "obsidian";
 import type AozoraPlugin from "./main";
+import type { Encoding, GaijiFallback, WritingMode } from "./schema/settings";
 
-export type WritingMode = "horizontal" | "vertical";
-export type Encoding = "utf8" | "sjis";
-export type GaijiFallback = "image" | "description" | "codepoint";
-
-export interface AozoraSettings {
-  writingMode: WritingMode;
-  enableLivePreview: boolean;
-  defaultEncoding: Encoding;
-  gaijiFallback: GaijiFallback;
-  detectAozoraTxt: boolean;
-  txtGlob: readonly string[];
-}
-
-export const DEFAULT_SETTINGS: AozoraSettings = {
-  writingMode: "horizontal",
-  enableLivePreview: true,
-  defaultEncoding: "utf8",
-  gaijiFallback: "description",
-  detectAozoraTxt: true,
-  txtGlob: [],
-};
+// Re-exports keep the public path stable for sibling modules that
+// already imported types and DEFAULT_SETTINGS from "./settings".
+// The actual definitions now live next to the zod schema in
+// `src/schema/settings.ts` so the runtime validator and the static
+// types are declared once and stay in lockstep.
+export type { AozoraSettings, Encoding, GaijiFallback, WritingMode } from "./schema/settings";
+export { DEFAULT_SETTINGS } from "./schema/settings";
 
 export class AozoraSettingTab extends PluginSettingTab {
   private readonly plugin: AozoraPlugin;
