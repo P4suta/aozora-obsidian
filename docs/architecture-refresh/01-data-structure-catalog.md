@@ -157,14 +157,14 @@ Schema:
 
 | Candidate | Status | Solves | ADR | Notes |
 |---|---|---|---|---|
-| `aozora-scan` (Teddy + structural-bitmap + DFA) | adopted (upstream) | D1 | 0004 (planned) | Phase 2 will plumb its trigger output to TS instead of writing TS regexes. |
-| `aozora-lex` (`lex_into_arena`) | adopted (upstream) | D2 | 0004 (planned) | Same plumbing path. |
-| `aozora-veb` (Eytzinger) | adopted (upstream) | D2, D4 | 0004 (planned) | Indirect: registry lookup; aozora-obsidian doesn't talk to it directly. |
-| `aozora-encoding` (`encoding_rs` + Shift_JIS) | adopted (upstream) | D5 | 0004 (planned) | Markov extension Phase 9 if bench shows BOM-less misclassification. |
-| Boyer-Moore-Horspool / KMP / two-way | rejected | D1 | 0004 (planned) | Subsumed by `aozora-scan`. |
+| `aozora-scan` (Teddy + structural-bitmap + DFA) | adopted (upstream) | D1 | [0004](../adr/0004-aozora-scan-as-upstream-lexer.md) | Phase 2: `Document::nodes_json` projects `BorrowedLexOutput.source_nodes` to TS via JSON wire + zod. |
+| `aozora-lex` (`lex_into_arena`) | adopted (upstream) | D2 | [0004](../adr/0004-aozora-scan-as-upstream-lexer.md) | Same plumbing path. |
+| `aozora-veb` (Eytzinger) | adopted (upstream) | D2, D4 | [0004](../adr/0004-aozora-scan-as-upstream-lexer.md) | Indirect: registry lookup; aozora-obsidian doesn't talk to it directly. |
+| `aozora-encoding` (`encoding_rs` + Shift_JIS) | adopted (upstream) | D5 | [0004](../adr/0004-aozora-scan-as-upstream-lexer.md) | Markov extension Phase 9 if bench shows BOM-less misclassification. |
+| Boyer-Moore-Horspool / KMP / two-way | rejected | D1 | [0004](../adr/0004-aozora-scan-as-upstream-lexer.md) | Subsumed by `aozora-scan`. |
 | Pratt parser | hypothesis | D2 | TBD | Already used inside `aozora-lexer` via `aozora-spec`-driven pair tables; no new work needed unless the WASM-side AST exposure exposes a phase that benefits. |
 | PEG (`pest`) | rejected | D2 | 0004 (planned) | Context-sensitive notations (`［＃...、N 字下げ］`) push too much work into semantic actions; hand-rolled wins on readability. |
-| Tree-sitter | rejected | D2, D3 | 0004 (planned) | Functional overlap with Lezer; CodeMirror native is Lezer. Two parsers = lint-discipline violation. |
+| Tree-sitter | rejected | D2, D3 | [0004](../adr/0004-aozora-scan-as-upstream-lexer.md) | Functional overlap with Lezer; CodeMirror native is Lezer. Two parsers = lint-discipline violation. |
 | Lezer parser (Tree) | hypothesis | D2, D3 | TBD | Phase 4-5 builds Lezer Tree from WASM token stream + registers `LanguageSupport`. Bench gate: viewport 100p decoration build < 1 ms. |
 | Persistent rope | adopted (CodeMirror native) | D3 | 0004 (planned) | `@codemirror/state` Text. |
 | Hash consing | hypothesis | D2, D3 | TBD | Phase 11. Bench gate: 1 MB source, ≥ 20% memory reduction. |
