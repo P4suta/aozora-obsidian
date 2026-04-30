@@ -252,6 +252,25 @@
   text-orientation: upright;
   font-feature-settings: "vert", "vrt2";
 }
+
+/* Japanese typography conveniences (Phase 13, N layer).
+ *
+ * `text-spacing-trim` is the W3C CSS Text 4 facility that performs
+ * 約物半角化 (Japanese punctuation half-widthing) at glyph-render
+ * time without the TS-side prelude in src/typography/japanese.ts.
+ * As of 2025-2026 the property is enabled in evergreen Chromium /
+ * Safari / Firefox; older runtimes silently ignore it (graceful
+ * degradation — full-width punctuation looks slightly off but
+ * remains legible).
+ *
+ * `text-spacing` (without the -trim suffix) is the broader CSS
+ * Text 4 control that subsumes -trim plus inter-script spacing
+ * adjustments. We declare both for forward-compat.
+ */
+.aozora {
+  text-spacing-trim: trim-start trim-end;
+  text-spacing: normal;
+}
 .aozora--vertical .aozora-bouten {
   text-emphasis-position: var(--aozora-bouten-position-vertical, "right");
 }
