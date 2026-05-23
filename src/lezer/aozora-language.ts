@@ -1,6 +1,6 @@
 import { defineLanguageFacet, foldNodeProp, indentNodeProp, Language } from "@codemirror/language";
 import type { Extension } from "@codemirror/state";
-import { type SyntaxNode, type Tree } from "@lezer/common";
+import type { SyntaxNode, Tree } from "@lezer/common";
 import { styleTags, tags as t } from "@lezer/highlight";
 import type { AozoraNodeView } from "../wasm/node-schema";
 import { buildAozoraTree } from "./aozora-parser";
@@ -126,23 +126,47 @@ export function aozoraLanguageFromNodes(
  * input. The standard `LRParser`-driven flow does an actual parse
  * here; Aozora's parse already happened in WASM before we got
  * here, so this shortcut is the natural fit.
+ *
+ * `configure` returns the *same* parser instance rather than
+ * recursing — Aozora's fixed-tree parser has no settings to flip
+ * and a self-return both keeps coverage tight (no per-call
+ * re-instantiation of every closure) and is observably equivalent
+ * for every consumer.
  */
-function fixedTreeParser(tree: Tree): {
-  parse: () => Tree;
-  configure: (_: unknown) => { parse: () => Tree };
-  hasWrappers: () => boolean;
-  startParse: () => { advance: () => Tree; stoppedAt: null; parsedPos: number };
-} {
-  return {
+interface PartialParseLike {
+  readonly advance: () => Tree;
+  readonly stoppedAt: null;
+  readonly parsedPos: number;
+  readonly stopAt: (_pos: number) => void;
+}
+
+interface FixedTreeParser {
+  readonly parse: () => Tree;
+  readonly configure: (_: unknown) => FixedTreeParser;
+  readonly hasWrappers: () => boolean;
+  readonly startParse: () => PartialParseLike;
+  readonly createParse: (
+    _input: unknown,
+    _fragments: unknown,
+    _ranges: unknown,
+  ) => PartialParseLike;
+}
+
+function fixedTreeParser(tree: Tree): FixedTreeParser {
+  const startParse = (): PartialParseLike => ({
+    advance: () => tree,
+    stoppedAt: null,
+    parsedPos: tree.length,
+    stopAt: (_pos: number) => {},
+  });
+  const parser: FixedTreeParser = {
     parse: () => tree,
-    configure: (_) => fixedTreeParser(tree),
+    configure: (_) => parser,
     hasWrappers: () => false,
-    startParse: () => ({
-      advance: () => tree,
-      stoppedAt: null,
-      parsedPos: tree.length,
-    }),
+    startParse,
+    createParse: (_input, _fragments, _ranges) => startParse(),
   };
+  return parser;
 }
 
 /**

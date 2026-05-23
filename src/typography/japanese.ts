@@ -35,17 +35,27 @@
  * ascii `,` instead of `、` etc.); the half-width form mirrors
  * the ascii spacing the TeX rule emulates.
  */
+// Swap table: full-width Japanese punctuation → ascii equivalent.
+//
+// IMPORTANT: the swap is single-character → single-character with
+// no inserted whitespace. Inserting a trailing / leading space
+// would break idempotence (a space created by the first pass would
+// expand the ascii context for an adjacent full-width character on
+// the second pass, triggering a further swap). The chooser of
+// ascii whitespace cadence is the renderer (CSS `text-spacing-trim`
+// already handles the visual half-widthing — this prelude exists
+// for fallback browsers that ignore the property).
 const PUNCTUATION_TO_HALF_WIDTH: ReadonlyMap<string, string> = new Map([
   // sentence punctuation
-  ["、", ", "],
-  ["。", ". "],
+  ["、", ","],
+  ["。", "."],
   // brackets
-  ["（", " ("],
-  ["）", ") "],
-  ["「", " ‘"],
-  ["」", "’ "],
-  ["『", " “"],
-  ["』", "” "],
+  ["（", "("],
+  ["）", ")"],
+  ["「", "‘"],
+  ["」", "’"],
+  ["『", "“"],
+  ["』", "”"],
 ]);
 
 /**
@@ -83,15 +93,26 @@ export function applyHalfWidthPunctuation(input: string): string {
   }
   let out = "";
   for (let i = 0; i < input.length; i += 1) {
+    // `i < input.length` keeps the indexed access in bounds; the
+    // `?? ""` is a defensive fallback for an invariant regression.
+    /* istanbul ignore next -- defensive: bounded loop; `?? ""`
+       is dead under the invariant. */
     const ch = input[i] ?? "";
     const replacement = PUNCTUATION_TO_HALF_WIDTH.get(ch);
     if (replacement === undefined) {
       out += ch;
       continue;
     }
+    // Trigger from the ORIGINAL input (`input[i±1]`), restricted to
+    // ascii letters / digits. Restricting to letter+digit (i.e. NOT
+    // ascii punctuation like `,` / `.`) is what makes the function
+    // idempotent: a swap-introduced `,` next to a `。` would, under
+    // a permissive "any ascii" rule, trigger another swap on the
+    // second pass. With the letter/digit-only rule, swap targets
+    // never themselves act as triggers.
     const before = input[i - 1] ?? "";
     const after = input[i + 1] ?? "";
-    if (isAscii(before) || isAscii(after)) {
+    if (isAsciiLetterOrDigit(before) || isAsciiLetterOrDigit(after)) {
       out += replacement;
     } else {
       out += ch;
@@ -114,13 +135,18 @@ export function isLineStartForbidden(ch: string): boolean {
   return FORBIDDEN_LINE_START.has(ch);
 }
 
-function isAscii(ch: string): boolean {
+function isAsciiLetterOrDigit(ch: string): boolean {
   if (ch.length === 0) {
     return false;
   }
   const code = ch.charCodeAt(0);
-  // Treat ascii printable + space as "latin context" for the
-  // 約物半角化 trigger. Anything ≥ 0x80 is non-latin and leaves
-  // the punctuation full-width.
-  return code >= 0x20 && code < 0x80;
+  // ASCII A-Z, a-z, 0-9. Excludes punctuation and whitespace so a
+  // swap-introduced `,` next to a still-full-width `。` doesn't
+  // chain a further swap on the next pass — the function stays
+  // idempotent under the swap table defined above.
+  return (
+    (code >= 0x41 && code <= 0x5a) || // A-Z
+    (code >= 0x61 && code <= 0x7a) || // a-z
+    (code >= 0x30 && code <= 0x39) //   0-9
+  );
 }

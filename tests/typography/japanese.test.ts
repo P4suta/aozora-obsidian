@@ -20,11 +20,21 @@ describe("applyHalfWidthPunctuation", () => {
   });
 
   it("halves 、 when adjacent to an ascii character (left)", () => {
-    expect(applyHalfWidthPunctuation("hello、world")).toBe("hello, world");
+    expect(applyHalfWidthPunctuation("hello、world")).toBe("hello,world");
   });
 
   it("halves 。 when adjacent to ascii (left)", () => {
-    expect(applyHalfWidthPunctuation("end。X")).toBe("end. X");
+    expect(applyHalfWidthPunctuation("end。X")).toBe("end.X");
+  });
+
+  it("only the punctuation directly adjacent to a letter/digit gets swapped (idempotent boundary)", () => {
+    // Letter-only triggering: the leading `、` swaps because of
+    // the leading `a`; the trailing `。` does NOT swap because its
+    // neighbours are punctuation / boundary, not letter/digit.
+    // This is what keeps the function idempotent — see
+    // `isAsciiLetterOrDigit` and the swap-table preamble.
+    expect(applyHalfWidthPunctuation("a、。")).toBe("a,。");
+    expect(applyHalfWidthPunctuation("a,。")).toBe("a,。");
   });
 
   it("halves 「」 when surrounded by ascii", () => {
@@ -49,12 +59,12 @@ describe("applyHalfWidthPunctuation", () => {
     );
   });
 
-  it("never returns a longer string than max possible (length-bounded property)", () => {
+  it("never returns a longer string than the input (length-preserving property)", () => {
     fc.assert(
       fc.property(fc.string({ maxLength: 200 }), (s) => {
         const out = applyHalfWidthPunctuation(s);
-        // Each character maps to at most 2 characters (e.g. `、` → `, `).
-        expect(out.length).toBeLessThanOrEqual(s.length * 2);
+        // Single-char → single-char swap preserves length exactly.
+        expect(out.length).toBe(s.length);
       }),
     );
   });
@@ -72,8 +82,31 @@ describe("isLineStartForbidden", () => {
     ["A", false],
     ["「", false],
     ["", false],
+    // digit case exercises the third branch in `isAsciiLetterOrDigit`
+    // (used by applyHalfWidthPunctuation; reused here as a smoke).
+    ["0", false],
+    ["9", false],
   ])("classifies %s correctly", (ch, expected) => {
     expect(isLineStartForbidden(ch)).toBe(expected);
+  });
+
+  it("digits trigger the half-width swap (covers the digit branch of isAsciiLetterOrDigit)", () => {
+    expect(applyHalfWidthPunctuation("1、2")).toBe("1,2");
+  });
+
+  it("characters in the gap between letter ranges (0x3A-0x40) do NOT trigger swap", () => {
+    // 0x3A ':' / 0x3F '?' sit between digits (0x30-0x39) and
+    // uppercase letters (0x41-0x5A). They're ascii but not
+    // letter-or-digit, so they must NOT count as ascii context for
+    // the punctuation swap. Same for 0x5B-0x60 (gap between
+    // uppercase and lowercase letters).
+    expect(applyHalfWidthPunctuation(":、?")).toBe(":、?");
+    expect(applyHalfWidthPunctuation("[、`")).toBe("[、`");
+  });
+
+  it("ascii beyond 0x7A is not letter-or-digit (covers the upper bound)", () => {
+    // 0x7B '{' is one past 'z' (0x7A). Should NOT trigger.
+    expect(applyHalfWidthPunctuation("{、}")).toBe("{、}");
   });
 
   it("the forbidden set is closed under self-test", () => {

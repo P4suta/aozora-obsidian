@@ -72,6 +72,22 @@ describe("Aozora NodeSet metadata", () => {
     expect(headingType?.prop(foldNodeProp)).toBeDefined();
   });
 
+  it("foldNodeProp callbacks return the supplied node's [from, to] range", () => {
+    const containerType = aozoraNodeSetForTests.types.find(
+      (nt) => nt.id === nodeIdForKind("container"),
+    );
+    const headingType = aozoraNodeSetForTests.types.find(
+      (nt) => nt.id === nodeIdForKind("heading"),
+    );
+    const containerFold = containerType?.prop(foldNodeProp);
+    const headingFold = headingType?.prop(foldNodeProp);
+    // Build a fake SyntaxNode-like object with from/to; the
+    // foldNodeProp callback is structurally typed.
+    const fakeNode = { from: 5, to: 12 } as unknown as Parameters<NonNullable<typeof containerFold>>[0];
+    expect(containerFold?.(fakeNode)).toEqual({ from: 5, to: 12 });
+    expect(headingFold?.(fakeNode)).toEqual({ from: 5, to: 12 });
+  });
+
   it("attaches indentNodeProp to Container and Indent", () => {
     const containerType = aozoraNodeSetForTests.types.find(
       (nt) => nt.id === nodeIdForKind("container"),
@@ -81,6 +97,20 @@ describe("Aozora NodeSet metadata", () => {
     );
     expect(containerType?.prop(indentNodeProp)).toBeDefined();
     expect(indentType?.prop(indentNodeProp)).toBeDefined();
+  });
+
+  it("indentNodeProp callbacks return baseIndent + unit", () => {
+    const containerType = aozoraNodeSetForTests.types.find(
+      (nt) => nt.id === nodeIdForKind("container"),
+    );
+    const indentType = aozoraNodeSetForTests.types.find(
+      (nt) => nt.id === nodeIdForKind("indent"),
+    );
+    const containerIndent = containerType?.prop(indentNodeProp);
+    const indentIndent = indentType?.prop(indentNodeProp);
+    const fakeCx = { baseIndent: 2, unit: 4 } as unknown as Parameters<NonNullable<typeof containerIndent>>[0];
+    expect(containerIndent?.(fakeCx)).toBe(6);
+    expect(indentIndent?.(fakeCx)).toBe(6);
   });
 });
 

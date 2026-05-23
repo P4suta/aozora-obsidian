@@ -1,7 +1,7 @@
-import { computed, effect, type ReadonlySignal, signal, type Signal } from "@preact/signals-core";
+import { computed, effect, type ReadonlySignal, type Signal, signal } from "@preact/signals-core";
 import { type AozoraSettings, parseStoredSettings } from "../schema/settings";
-import { type CycleError, topologicalSort } from "./topology";
 import { err, ok, type Result } from "../types/result";
+import { type CycleError, topologicalSort } from "./topology";
 
 /**
  * Signal-driven settings store. Phase 6 (Reactivity layer, I).
@@ -140,9 +140,7 @@ export interface EffectGraph {
   readonly edges: readonly { readonly from: string; readonly to: string }[];
 }
 
-export function registerEffects(
-  graph: EffectGraph,
-): Result<() => void, CycleError<string>> {
+export function registerEffects(graph: EffectGraph): Result<() => void, CycleError<string>> {
   const ids = graph.effects.map((e) => e.id);
   const sortResult = topologicalSort(ids, graph.edges);
   if (!sortResult.ok) {
@@ -153,6 +151,10 @@ export function registerEffects(
   const disposers: (() => void)[] = [];
   for (const id of ordered) {
     const spec = idToSpec.get(id);
+    /* istanbul ignore if -- defensive: `topologicalSort` returns a
+       permutation of `ids`, which is exactly the keys we seeded
+       into `idToSpec`. `continue` is a fail-soft invariant
+       safeguard, not a reachable branch. */
     if (spec === undefined) {
       continue;
     }
@@ -162,8 +164,11 @@ export function registerEffects(
     disposers.push(dispose);
   }
   return ok(() => {
-    // Run cleanup in reverse-topological order.
+    // Run cleanup in reverse-topological order. The optional chain
+    // is defensive against an out-of-bounds index regression.
     for (let i = disposers.length - 1; i >= 0; i--) {
+      /* istanbul ignore next -- defensive: bounded loop keeps
+         `disposers[i]` defined; `?.()` is dead under the invariant. */
       disposers[i]?.();
     }
   });

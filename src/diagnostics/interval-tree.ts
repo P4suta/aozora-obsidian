@@ -60,9 +60,7 @@ export interface IntervalTree<T> {
  * is `O(n)`. Allocation: one `IntervalNode` per input. Empty
  * input → empty tree (`size: 0`, `stab` always returns `[]`).
  */
-export function buildIntervalTree<T>(
-  intervals: readonly Interval<T>[],
-): IntervalTree<T> {
+export function buildIntervalTree<T>(intervals: readonly Interval<T>[]): IntervalTree<T> {
   if (intervals.length === 0) {
     return EMPTY_TREE as IntervalTree<T>;
   }
@@ -97,6 +95,10 @@ function buildSubtree<T>(
   }
   const mid = (lo + hi) >>> 1;
   const here = sorted[mid];
+  /* istanbul ignore if -- defensive: `lo < hi` and `mid ∈ [lo, hi)`
+     guarantees `sorted[mid]` is defined; the early return is a
+     fail-fast safeguard against an invariant violation rather than
+     a reachable branch in production. */
   if (here === undefined) {
     return null;
   }
@@ -124,11 +126,7 @@ function collectStab<T>(node: IntervalNode<T> | null, p: number): Interval<T>[] 
   return out;
 }
 
-function walkStab<T>(
-  node: IntervalNode<T> | null,
-  p: number,
-  out: Interval<T>[],
-): void {
+function walkStab<T>(node: IntervalNode<T> | null, p: number, out: Interval<T>[]): void {
   if (node === null || node.maxEnd <= p) {
     // No descendant can overlap `p` if the subtree's maxEnd is
     // already <= p (intervals are half-open: start <= p < end).
@@ -144,11 +142,7 @@ function walkStab<T>(
 }
 
 /** Walk the tree collecting intervals overlapping `[lo, hi]` (closed). */
-function collectRange<T>(
-  node: IntervalNode<T> | null,
-  lo: number,
-  hi: number,
-): Interval<T>[] {
+function collectRange<T>(node: IntervalNode<T> | null, lo: number, hi: number): Interval<T>[] {
   const out: Interval<T>[] = [];
   walkRange(node, lo, hi, out);
   return out;

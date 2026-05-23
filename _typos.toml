@@ -4,13 +4,16 @@ extend-ignore-identifiers-re = [
 ]
 
 [default.extend-words]
-aozora     = "aozora"
-obsidian   = "obsidian"
-codemirror = "codemirror"
-furigana   = "furigana"
-bouten     = "bouten"
-P4suta     = "P4suta"
-Yasunobu   = "Yasunobu"
+aozora      = "aozora"
+obsidian    = "obsidian"
+codemirror  = "codemirror"
+furigana    = "furigana"
+bouten      = "bouten"
+P4suta      = "P4suta"
+Yasunobu    = "Yasunobu"
+unparseable = "unparseable"
+ND          = "ND"
+OT          = "OT"
 
 [files]
 extend-exclude = [

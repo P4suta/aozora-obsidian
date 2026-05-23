@@ -24,7 +24,7 @@ const PRIME32_4 = 0x27_d4_eb_2f | 0;
 const PRIME32_5 = 0x16_56_67_b1 | 0;
 
 function rotl32(x: number, r: number): number {
-  return ((x << r) | (x >>> (32 - r))) | 0;
+  return (x << r) | (x >>> (32 - r)) | 0;
 }
 
 function round32(acc: number, lane: number): number {
@@ -34,11 +34,19 @@ function round32(acc: number, lane: number): number {
 }
 
 function readU32LE(input: Uint8Array, offset: number): number {
+  // Callers gate every invocation on `offset + 4 <= input.length`,
+  // so the four indexed reads never go out of bounds. The `?? 0`
+  // fallbacks below are defensive — they ensure that an invariant
+  // violation (caller bug regressing the bound check) yields a
+  // deterministic 0 byte rather than NaN propagation through the
+  // hash, keeping the failure mode bounded.
+  /* istanbul ignore next -- defensive: bound-checked by every
+     caller; the `?? 0` arms are dead under that invariant. */
   return (
-    ((input[offset] ?? 0) |
-      ((input[offset + 1] ?? 0) << 8) |
-      ((input[offset + 2] ?? 0) << 16) |
-      ((input[offset + 3] ?? 0) << 24)) |
+    (input[offset] ?? 0) |
+    ((input[offset + 1] ?? 0) << 8) |
+    ((input[offset + 2] ?? 0) << 16) |
+    ((input[offset + 3] ?? 0) << 24) |
     0
   );
 }
@@ -54,7 +62,7 @@ export function xxhash32(input: Uint8Array, seed = 0): number {
 
   if (length >= 16) {
     let v1 = ((seed + PRIME32_1) | 0) + PRIME32_2;
-    v1 = v1 | 0;
+    v1 |= 0;
     let v2 = (seed + PRIME32_2) | 0;
     let v3 = seed | 0;
     let v4 = (seed - PRIME32_1) | 0;
@@ -81,6 +89,11 @@ export function xxhash32(input: Uint8Array, seed = 0): number {
   }
 
   while (i < length) {
+    // `i < length` invariant keeps `input[i]` in bounds; the
+    // `?? 0` is defensive against an invariant-violation regression
+    // and yields a deterministic byte rather than NaN.
+    /* istanbul ignore next -- defensive: bound-checked by the loop
+       condition; the nullish branch is dead under the invariant. */
     const byte = input[i] ?? 0;
     h = (h + Math.imul(byte, PRIME32_5)) | 0;
     h = Math.imul(rotl32(h, 11), PRIME32_1) | 0;

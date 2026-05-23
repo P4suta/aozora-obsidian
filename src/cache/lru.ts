@@ -35,9 +35,7 @@ export interface LruCache<K, V> {
  */
 export function createLruCache<K, V>(capacity: number): LruCache<K, V> {
   if (capacity < 1 || !Number.isInteger(capacity)) {
-    throw new TypeError(
-      `LRU capacity must be a positive integer, got ${capacity}`,
-    );
+    throw new TypeError(`LRU capacity must be a positive integer, got ${capacity}`);
   }
   const store = new Map<K, V>();
   return {
@@ -61,6 +59,12 @@ export function createLruCache<K, V>(capacity: number): LruCache<K, V> {
       while (store.size > capacity) {
         // The first key in iteration order is the LRU.
         const oldest = store.keys().next();
+        /* istanbul ignore if -- defensive: the loop condition
+           `store.size > capacity ≥ 1` guarantees the iterator has
+           at least one entry, so `done === true` is unreachable.
+           The branch exists only as an invariant-violation
+           safeguard — fail-fast break rather than silently
+           delete `undefined`. */
         if (oldest.done === true) {
           break;
         }
