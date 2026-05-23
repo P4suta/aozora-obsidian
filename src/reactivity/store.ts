@@ -26,13 +26,13 @@ import { type CycleError, topologicalSort } from "./topology";
  * via `err(...)` rather than crashing later in production.
  */
 
-export type SettingSignal<K extends keyof AozoraSettings> = Signal<AozoraSettings[K]>;
+type SettingSignal<K extends keyof AozoraSettings> = Signal<AozoraSettings[K]>;
 
-export type SettingSignals = {
+type SettingSignals = {
   readonly [K in keyof AozoraSettings]: SettingSignal<K>;
 };
 
-export interface ReactiveStore {
+interface ReactiveStore {
   /** Per-setting signals; reading inside `effect` registers a dep. */
   readonly signals: SettingSignals;
   /**
@@ -130,12 +130,12 @@ function applyUpdate<K extends keyof AozoraSettings>(
  * order so any effect-local cleanup observes its dependencies in
  * a consistent state.
  */
-export interface EffectSpec {
+interface EffectSpec {
   readonly id: string;
   readonly run: () => void | Promise<void>;
 }
 
-export interface EffectGraph {
+interface EffectGraph {
   readonly effects: readonly EffectSpec[];
   readonly edges: readonly { readonly from: string; readonly to: string }[];
 }

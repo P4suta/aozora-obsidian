@@ -14,7 +14,7 @@
  * Phase 11 of the Architectural Refresh round.
  */
 
-export interface LruCache<K, V> {
+interface LruCache<K, V> {
   /** Look up; returns undefined on miss. Marks the entry as recently used. */
   readonly get: (key: K) => V | undefined;
   /** Insert or replace. Evicts the least-recently-used on capacity. */

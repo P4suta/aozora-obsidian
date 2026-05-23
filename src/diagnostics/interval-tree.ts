@@ -35,7 +35,7 @@ interface IntervalNode<T> {
   readonly right: IntervalNode<T> | null;
 }
 
-export interface IntervalTree<T> {
+interface IntervalTree<T> {
   /** Number of intervals stored. */
   readonly size: number;
   /**

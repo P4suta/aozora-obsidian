@@ -11,7 +11,7 @@
 
 import { err, ok, type Result } from "../types/result";
 
-export interface TopologyEdge<N> {
+interface TopologyEdge<N> {
   readonly from: N;
   readonly to: N;
 }

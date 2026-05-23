@@ -87,7 +87,9 @@ export function all<T, E>(results: readonly Result<T, E>[]): Result<readonly T[]
 }
 
 /** Alias for `all` matching the traverse / sequence vocabulary. */
-export const sequence = all;
+export function sequence<T, E>(results: readonly Result<T, E>[]): Result<readonly T[], E> {
+  return all(results);
+}
 
 /**
  * Run a side-effect on the OK value without changing the Result.
