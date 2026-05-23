@@ -48,6 +48,19 @@ describe("aozoraLanguage", () => {
     const lang = aozoraLanguage(tree);
     expect(lang.parser.hasWrappers()).toBe(false);
   });
+
+  it("createParse mirrors startParse so Lezer's Parser contract is honoured", () => {
+    const tree = buildAozoraTree("hi", []);
+    const lang = aozoraLanguage(tree);
+    // biome-ignore lint/suspicious/noExplicitAny: Lezer Parser typing leaks `Input` here; the runtime accepts any string.
+    const partial = (lang.parser as any).createParse("ignored", [], []);
+    expect(partial.parsedPos).toBe(tree.length);
+    expect(partial.stoppedAt).toBeNull();
+    expect(partial.advance().length).toBe(tree.length);
+    // stopAt is a no-op on the fixed-tree parser but must exist on the contract.
+    expect(typeof partial.stopAt).toBe("function");
+    partial.stopAt(0);
+  });
 });
 
 describe("aozoraLanguageFromNodes", () => {
