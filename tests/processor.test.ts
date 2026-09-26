@@ -1,26 +1,29 @@
 import type { Document as RawDocument } from "aozora-wasm";
 import type { MarkdownPostProcessorContext } from "obsidian";
 import { describe, expect, it, vi } from "vitest";
-import { AozoraDocumentHandle } from "../src/aozora-wasm";
+import { type AozoraDiagnostic, AozoraDocumentHandle } from "../src/aozora-wasm";
 import { createAozoraCodeBlockProcessor } from "../src/processor";
 import type { AozoraSettings } from "../src/settings";
 import type { AozoraParser } from "../src/wasm-loader";
 
-function fakeRawDocument(html: string, diagnosticsJson = "[]"): RawDocument {
+function fakeRawDocument(
+  html: string,
+  diagnostics: readonly AozoraDiagnostic[] = [],
+): RawDocument {
   return {
-    to_html: () => html,
-    serialize: () => "",
-    diagnostics_json: () => diagnosticsJson,
-    source_byte_len: () => 0,
+    toHtml: () => html,
+    toSource: () => "",
+    diagnostics: () => diagnostics,
+    sourceByteLen: () => 0,
     free: () => {},
     [Symbol.dispose]: () => {},
   } as unknown as RawDocument;
 }
 
-function fakeParser(html: string, diagnosticsJson = "[]"): AozoraParser {
+function fakeParser(html: string, diagnostics: readonly AozoraDiagnostic[] = []): AozoraParser {
   const inner = {
     ready: () => Promise.resolve(),
-    parse: async () => new AozoraDocumentHandle(fakeRawDocument(html, diagnosticsJson)),
+    parse: async () => new AozoraDocumentHandle(fakeRawDocument(html, diagnostics)),
   };
   return inner as unknown as AozoraParser;
 }
@@ -74,11 +77,16 @@ describe("createAozoraCodeBlockProcessor", () => {
   });
 
   it("appends a diagnostics note when the WASM reports them", async () => {
-    const diagnosticsJson = JSON.stringify([
-      { kind: "unclosed_bracket", span_start: 0, span_end: 1 },
-    ]);
+    const diagnostics: readonly AozoraDiagnostic[] = [
+      {
+        kind: "unclosed_bracket",
+        severity: "error",
+        source: "source",
+        span: { start: 0, end: 1 },
+      },
+    ];
     const processor = createAozoraCodeBlockProcessor({
-      parser: fakeParser("<p>x</p>", diagnosticsJson),
+      parser: fakeParser("<p>x</p>", diagnostics),
       getSettings: () => settings(),
     });
     const el = document.createElement("div");

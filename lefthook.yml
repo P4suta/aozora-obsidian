@@ -69,7 +69,7 @@ pre-push:
         TOTAL=0
         for f in main.js aozora.wasm; do
           if [ -f "$f" ]; then
-            BYTES=$(stat -c %s "$f")
+            BYTES=$(wc -c < "$f" | tr -d '[:space:]')
             TOTAL=$((TOTAL + BYTES))
             echo "  $f: $BYTES bytes"
           fi

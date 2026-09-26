@@ -7,10 +7,10 @@ import type { AozoraParser } from "../src/wasm-loader";
 
 function fakeRawDocument(html: string): RawDocument {
   return {
-    to_html: () => html,
-    serialize: () => "",
-    diagnostics_json: () => "[]",
-    source_byte_len: () => 0,
+    toHtml: () => html,
+    toSource: () => "",
+    diagnostics: () => [],
+    sourceByteLen: () => 0,
     free: () => {},
     [Symbol.dispose]: () => {},
   } as unknown as RawDocument;
