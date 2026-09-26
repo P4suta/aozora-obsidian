@@ -1,20 +1,21 @@
 import type { Plugin } from "obsidian";
 import { describe, expect, it, vi } from "vitest";
+import init from "aozora-wasm";
 import { AozoraParser } from "../src/wasm-loader";
 
 vi.mock("aozora-wasm", () => {
   class FakeDocument {
     constructor(private readonly source: string) {}
-    to_html(): string {
+    toHtml(): string {
       return `<p>${this.source}</p>`;
     }
-    serialize(): string {
+    toSource(): string {
       return this.source;
     }
-    diagnostics_json(): string {
-      return "[]";
+    diagnostics(): readonly unknown[] {
+      return [];
     }
-    source_byte_len(): number {
+    sourceByteLen(): number {
       return this.source.length;
     }
     free(): void {}
@@ -84,5 +85,9 @@ describe("AozoraParser", () => {
       readBinary: ReturnType<typeof vi.fn>;
     };
     expect(adapter.readBinary).toHaveBeenCalledWith("/plugin/aozora.wasm");
+    const moduleOrPath = "module_or_path";
+    expect(vi.mocked(init)).toHaveBeenLastCalledWith({
+      [moduleOrPath]: new Uint8Array(buffer),
+    });
   });
 });

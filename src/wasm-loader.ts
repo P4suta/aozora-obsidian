@@ -41,7 +41,8 @@ export class AozoraParser {
     // Hand it the bytes obtained via the vault adapter — no `fetch()`
     // call leaves the plugin, so capacitor's WebView (mobile) and
     // Electron (desktop) reach the same instantiation code path.
-    await init(bytes);
+    const moduleOrPath = "module_or_path";
+    await init({ [moduleOrPath]: bytes });
   }
 
   /**

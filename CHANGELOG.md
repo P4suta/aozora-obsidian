@@ -6,6 +6,10 @@ the project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html
 
 ## [Unreleased]
 
+### Fixed
+
+- Updated the plugin adapter to the typed camel-case API emitted by the current `aozora-wasm`, including warning-free WASM initialization.
+
 ### Added
 
 - Initial repository scaffolding: plugin manifest, esbuild config,
