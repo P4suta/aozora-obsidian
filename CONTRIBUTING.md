@@ -53,10 +53,9 @@ Symlink the plugin folder into your vault for end-to-end testing:
 ln -s "$PWD" "$OBSIDIAN_VAULT/.obsidian/plugins/aozora"
 ```
 
-The build expects the sibling `aozora` repository at `../aozora`
-(checked out next to this repo). It supplies the `aozora-wasm` crate
-that `just wasm` compiles into `pkg/` + `aozora.wasm`. See the
-README's **Bundling the WASM artefact** section for the contract.
+The build expects the sibling `aozora` repository at `../aozora`, checked out next to this repository.
+The parser supplies the `aozora-wasm` crate that `just wasm` compiles into `pkg/` and `aozora.wasm`.
+The [parser integration decision](docs/adr/0001-bundle-aozora-as-wasm.md) records the bundle contract.
 
 ## Coding conventions
 

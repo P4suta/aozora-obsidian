@@ -28,7 +28,7 @@
     "wasm"
   ],
   "author": "aozora-obsidian contributors",
-  "license": "(Apache-2.0 OR MIT)",
+  "license": "MIT OR Apache-2.0",
   "repository": {
     "type": "git",
     "url": "https://github.com/P4suta/aozora-obsidian.git"
