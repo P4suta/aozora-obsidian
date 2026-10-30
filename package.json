@@ -37,19 +37,19 @@
   "bugs": "https://github.com/P4suta/aozora-obsidian/issues",
   "dependencies": {
     "aozora-wasm": "file:./pkg",
-    "minimatch": "^10.2.5"
+    "minimatch": "^10.2.6"
   },
   "devDependencies": {
-    "@biomejs/biome": "^2.4.13",
-    "@codemirror/state": "^6.6.0",
-    "@codemirror/view": "^6.41.1",
-    "@types/node": "^25.6.0",
-    "@vitest/coverage-istanbul": "^4.1.5",
-    "esbuild": "^0.28.0",
-    "fast-check": "^4.7.0",
-    "happy-dom": "^21.0.0",
-    "obsidian": "^1.12.3",
+    "@biomejs/biome": "^2.6.4",
+    "@codemirror/state": "6.7.6",
+    "@codemirror/view": "6.43.13",
+    "@types/node": "^25.9.9",
+    "@vitest/coverage-istanbul": "^4.1.12",
+    "esbuild": "^0.28.2",
+    "fast-check": "^4.10.2",
+    "happy-dom": "^21.0.4",
+    "obsidian": "^1.14.4",
     "typescript": "^6.0.3",
-    "vitest": "^4.1.5"
+    "vitest": "^4.1.12"
   }
 }

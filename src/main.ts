@@ -34,7 +34,7 @@ interface InternalApp extends App {
 }
 
 export default class AozoraPlugin extends Plugin {
-  settings!: AozoraSettings;
+  aozoraSettings!: AozoraSettings;
   private parser!: AozoraParser;
   private readonly livePreviewCompartment = new Compartment();
   private txtRegistered = false;
@@ -50,7 +50,7 @@ export default class AozoraPlugin extends Plugin {
       "aozora",
       createAozoraCodeBlockProcessor({
         parser: this.parser,
-        getSettings: () => this.settings,
+        getSettings: () => this.aozoraSettings,
       }),
     );
 
@@ -75,11 +75,11 @@ export default class AozoraPlugin extends Plugin {
 
   async loadSettings(): Promise<void> {
     const stored = (await this.loadData()) as Partial<AozoraSettings> | null;
-    this.settings = { ...DEFAULT_SETTINGS, ...(stored ?? {}) };
+    this.aozoraSettings = { ...DEFAULT_SETTINGS, ...(stored ?? {}) };
   }
 
   async saveSettings(): Promise<void> {
-    await this.saveData(this.settings);
+    await this.saveData(this.aozoraSettings);
   }
 
   /**
@@ -89,7 +89,7 @@ export default class AozoraPlugin extends Plugin {
    * immediately — without a plugin reload.
    */
   async updateSettings(partial: Partial<AozoraSettings>): Promise<void> {
-    this.settings = { ...this.settings, ...partial };
+    this.aozoraSettings = { ...this.aozoraSettings, ...partial };
     await this.saveSettings();
     this.applyLivePreviewToggle();
     this.applyTxtRegistration();
@@ -97,7 +97,7 @@ export default class AozoraPlugin extends Plugin {
   }
 
   private currentLivePreviewExtension(): Extension {
-    return this.settings.enableLivePreview ? aozoraLivePreviewExtension() : [];
+    return this.aozoraSettings.enableLivePreview ? aozoraLivePreviewExtension() : [];
   }
 
   private applyLivePreviewToggle(): void {
@@ -111,7 +111,7 @@ export default class AozoraPlugin extends Plugin {
   }
 
   private applyTxtRegistration(): void {
-    const desired = this.settings.detectAozoraTxt || this.settings.txtGlob.length > 0;
+    const desired = this.aozoraSettings.detectAozoraTxt || this.aozoraSettings.txtGlob.length > 0;
     if (desired && !this.txtRegistered) {
       this.registerExtensions(["txt"], "markdown");
       this.txtRegistered = true;
