@@ -56,8 +56,8 @@ Add a fenced block to a note to render a ruby annotation in Reading view:
 ## Development and design
 
 See [contributor guidance](../CONTRIBUTING.md) for the Docker-based development commands.
-See [ADR-0001](adr/0001-bundle-aozora-as-wasm.md) for the parser integration decision.
-See [ADR-0002](adr/0002-docker-first-development.md) for the development environment.
+[ADR-0001](adr/0001-bundle-aozora-as-wasm.md) records the parser integration decision.
+[ADR-0002](adr/0002-docker-first-development.md) describes the development environment.
 The parser source and its third-party attributions are in the [aozora repository](https://github.com/P4suta/aozora).
 
 ## License and attributions

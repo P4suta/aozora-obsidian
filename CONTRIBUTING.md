@@ -2,37 +2,30 @@
 
 Thank you for considering a contribution.
 
-## Licence agreement
+## License agreement
 
-By submitting a contribution to this repository you agree that your
-contribution is offered under the project's dual licence — Apache-2.0
-OR MIT, at the user's option.
+The [existing license agreement](https://github.com/P4suta/aozora-obsidian/blob/420a52279454d33c1e1193a85c1621ba6ec751f5/CONTRIBUTING.md#licence-agreement) states:
 
-## Issues vs discussions
+```text
+By submitting a contribution to this repository you agree that your contribution is offered under the project's dual licence — Apache-2.0 OR MIT, at the user's option.
+```
 
-- Use **Issues** for confirmed bugs, regressions, or concrete feature
-  proposals.
-- Use **Discussions** for open-ended questions and design ideas.
+## Issues and discussions
 
-Security issues do not go in either — see [`SECURITY.md`](./SECURITY.md).
+Use Issues for confirmed bugs, regressions, or concrete feature proposals.
+Use Discussions for open-ended questions and design ideas.
+Follow [`SECURITY.md`](./SECURITY.md) for security reports.
 
 ## Local development
 
-The project is Docker-first: every dev / lint / test / build command
-runs inside the multi-stage Dockerfile via `just`. Host prerequisites:
+The project runs development, lint, test, and build commands through Docker Compose and `just`.
 
-- **docker** ≥ 24 + **docker compose** v2.20+
-- **just** (managed via mise / homebrew / curl)
-- **lefthook** (managed via mise / homebrew; run `just hooks` once
-  after clone to wire the gate)
-- **typos** — host-level spell-checker, called by the pre-commit
-  hook so feedback is sub-second (mise: `mise use -g typos@latest`,
-  homebrew: `brew install typos-cli`)
-- An Obsidian installation with Developer mode enabled (for end-to-end
-  smoke testing)
+Install Docker 24 or later, Docker Compose 2.20 or later, `just`, `lefthook`, and `typos` on the host.
+Use an Obsidian installation with Developer mode for the development-vault smoke test.
+Install `just`, `lefthook`, and `typos` with mise or Homebrew.
+Run `just hooks` after cloning.
 
-That's it. Cargo / wasm-pack / bun / node / TypeScript / biome /
-vitest all live inside the image.
+Cargo, wasm-pack, Bun, Node.js, TypeScript, Biome, and Vitest run inside the images.
 
 ```sh
 just hooks           # install lefthook git hooks (one-time)
@@ -59,33 +52,28 @@ The [parser integration decision](docs/adr/0001-bundle-aozora-as-wasm.md) record
 
 ## Coding conventions
 
-- **TypeScript strict** + `exactOptionalPropertyTypes`. No `any` in
-  source code; vendor declaration files may use it where the upstream
-  surface is intrinsically dynamic.
-- **No fetch / spawn at runtime.** Mobile compatibility (ADR-0001)
-  rules out subprocesses and HTTP. Bytes-on-disk via `vault.adapter`
-  only.
-- **CSS** uses the class catalogue emitted by `aozora-render`
-  (`aozora-bouten`, `aozora-tcy`, `aozora-gaiji`, …) — sibling plugins
-  share the same prefix.
-- **No `// biome-ignore` / `// biome-disable`.** Lint rules exist for
-  a reason; restructure the code or rename the symbol instead.
+Use strict TypeScript with `exactOptionalPropertyTypes`.
+Source code must avoid `any`.
+Vendor declarations may use `any` when an upstream API requires a dynamic type.
 
-## Conventional Commits
+Obsidian Mobile compatibility requires local reads through `vault.adapter`, without `fetch`, subprocesses, or HTTP access.
+Use the CSS classes from `aozora-render`, such as `aozora-bouten`, `aozora-tcy`, and `aozora-gaiji`.
+Fix lint findings without `// biome-ignore` or `// biome-disable`.
 
-Type required, scope optional, breaking-`!` optional. Allowed scopes:
-`processor`, `livepreview`, `settings`, `wasm`, `styles`, `manifest`,
-`docs`, `ci`, `build`, `infra`, `deps`.
+## Commit format
+
+Use Conventional Commits with a required type, an optional scope, and optional `!` for breaking changes.
+Allowed scopes are `processor`, `livepreview`, `settings`, `wasm`, `styles`, `manifest`, `docs`, `ci`, `build`, `infra`, and `deps`.
 
 The `commit-msg` hook enforces the format.
 
 ## Pull request gates
 
-- `just ci` green (biome + tsc + wasm rebuild + vitest C1 100% +
-  esbuild + check-wasm hard-fail).
-- Plugin loads inside Obsidian without console errors. Use the dev
-  vault smoke checklist in the PR template (planned).
-- For new features, add or extend tests under `tests/` — coverage
-  must stay at 100% for non-integration modules (main.ts and
-  livepreview.ts are excluded; they're verified end-to-end in the
-  dev vault).
+Run `just ci` before opening a pull request.
+The command runs Biome, TypeScript, the WebAssembly rebuild, the 100% coverage gate, the production bundle, and the WebAssembly presence check.
+Load the production plugin in an Obsidian development vault and confirm the absence of console errors.
+Use the smoke checklist in the [pull request template](.github/PULL_REQUEST_TEMPLATE.md).
+
+Add or extend `tests/` for new features and keep configured coverage at 100%.
+The coverage gate excludes integration modules `src/main.ts` and `src/livepreview.ts`.
+Verify both modules in the development vault.
