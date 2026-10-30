@@ -6,16 +6,16 @@ import { type AozoraSettings, AozoraSettingTab, DEFAULT_SETTINGS } from "../src/
 
 interface FakePlugin {
   app: App;
-  settings: AozoraSettings;
+  aozoraSettings: AozoraSettings;
   updateSettings: ReturnType<typeof vi.fn>;
 }
 
 function makePlugin(): FakePlugin {
   const plugin: FakePlugin = {
     app: {} as App,
-    settings: { ...DEFAULT_SETTINGS },
+    aozoraSettings: { ...DEFAULT_SETTINGS },
     updateSettings: vi.fn(async (partial: Partial<AozoraSettings>) => {
-      Object.assign(plugin.settings, partial);
+      Object.assign(plugin.aozoraSettings, partial);
     }),
   };
   return plugin;
