@@ -1,0 +1,26 @@
+name = "aozora-obsidian"
+summary = "Render Aozora Bunko notation in Obsidian"
+install = """
+# No prebuilt release is available yet; build from source.
+# Requires Docker 24+, Docker Compose 2.20+, and just.
+git clone https://github.com/P4suta/aozora-obsidian.git
+git clone https://github.com/P4suta/aozora.git
+cd aozora-obsidian
+just build
+export OBSIDIAN_VAULT=/path/to/vault
+mkdir -p "$OBSIDIAN_VAULT/.obsidian/plugins"
+ln -s "$PWD" "$OBSIDIAN_VAULT/.obsidian/plugins/aozora"
+"""
+usage_language = "aozora"
+usage = "｜漢字《かんじ》"
+documentation_index = true
+copyright = "2026 aozora-obsidian contributors"
+license = "MIT OR Apache-2.0"
+
+[preserved_licenses]
+mit_sha256 = "4f66e0e9f7d5cb1a42bdc753d818edd387fefb76c5c17b02e31506f2c57319b2"
+apache_sha256 = "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30"
+
+[[consent]]
+contributor = "Yasunobu"
+evidence = "https://github.com/P4suta/aozora-obsidian/commit/d5764ab431729befc16a6fc8fd82c5a82d80ce48"
