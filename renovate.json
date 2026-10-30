@@ -4,13 +4,13 @@
   "packageRules": [
     {
       "description": "Match the installed Obsidian SDK's exact CodeMirror peer dependency.",
-      "matchManagers": ["npm"],
+      "matchDatasources": ["npm"],
       "matchPackageNames": ["@codemirror/state"],
       "allowedVersions": "6.7.6"
     },
     {
       "description": "Match the installed Obsidian SDK's exact CodeMirror peer dependency.",
-      "matchManagers": ["npm"],
+      "matchDatasources": ["npm"],
       "matchPackageNames": ["@codemirror/view"],
       "allowedVersions": "6.43.13"
     }

@@ -12,6 +12,7 @@ it.each(["@codemirror/state", "@codemirror/view"] as const)(
       (candidate: (typeof renovate.packageRules)[number]): boolean =>
         candidate.matchPackageNames.includes(name),
     );
+    expect(rule?.matchDatasources).toEqual(["npm"]);
     expect(rule?.allowedVersions).toBe(peer);
   },
 );
