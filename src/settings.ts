@@ -46,7 +46,7 @@ export class AozoraSettingTab extends PluginSettingTab {
         dropdown
           .addOption("horizontal", "Horizontal (横書き)")
           .addOption("vertical", "Vertical (縦書き)")
-          .setValue(this.plugin.settings.writingMode)
+          .setValue(this.plugin.aozoraSettings.writingMode)
           .onChange(async (value) => {
             await this.plugin.updateSettings({ writingMode: value as WritingMode });
           }),
@@ -56,7 +56,7 @@ export class AozoraSettingTab extends PluginSettingTab {
       .setName("Live preview")
       .setDesc("Decorate Aozora syntax in the live-preview editor as well.")
       .addToggle((toggle) =>
-        toggle.setValue(this.plugin.settings.enableLivePreview).onChange(async (value) => {
+        toggle.setValue(this.plugin.aozoraSettings.enableLivePreview).onChange(async (value) => {
           await this.plugin.updateSettings({ enableLivePreview: value });
         }),
       );
@@ -68,7 +68,7 @@ export class AozoraSettingTab extends PluginSettingTab {
         dropdown
           .addOption("utf8", "UTF-8")
           .addOption("sjis", "Shift_JIS (vintage Aozora .txt)")
-          .setValue(this.plugin.settings.defaultEncoding)
+          .setValue(this.plugin.aozoraSettings.defaultEncoding)
           .onChange(async (value) => {
             await this.plugin.updateSettings({ defaultEncoding: value as Encoding });
           }),
@@ -78,7 +78,7 @@ export class AozoraSettingTab extends PluginSettingTab {
       .setName("Detect Aozora .txt automatically")
       .setDesc("Treat any .txt file with a 底本：… header as Aozora-format.")
       .addToggle((toggle) =>
-        toggle.setValue(this.plugin.settings.detectAozoraTxt).onChange(async (value) => {
+        toggle.setValue(this.plugin.aozoraSettings.detectAozoraTxt).onChange(async (value) => {
           await this.plugin.updateSettings({ detectAozoraTxt: value });
         }),
       );
@@ -92,7 +92,7 @@ export class AozoraSettingTab extends PluginSettingTab {
       .addTextArea((area) =>
         area
           .setPlaceholder("小説/**/*.txt")
-          .setValue(this.plugin.settings.txtGlob.join("\n"))
+          .setValue(this.plugin.aozoraSettings.txtGlob.join("\n"))
           .onChange(async (value) => {
             const lines = value
               .split(/\r?\n/)
@@ -110,7 +110,7 @@ export class AozoraSettingTab extends PluginSettingTab {
           .addOption("image", "Show as image (PNG glyph)")
           .addOption("description", "Show description in 〔…〕 brackets")
           .addOption("codepoint", "Show codepoint (U+XXXX)")
-          .setValue(this.plugin.settings.gaijiFallback)
+          .setValue(this.plugin.aozoraSettings.gaijiFallback)
           .onChange(async (value) => {
             await this.plugin.updateSettings({ gaijiFallback: value as GaijiFallback });
           }),
