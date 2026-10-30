@@ -1,0 +1,18 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": ["github>P4suta/renovate-config"],
+  "packageRules": [
+    {
+      "description": "Match the installed Obsidian SDK's exact CodeMirror peer dependency.",
+      "matchManagers": ["npm"],
+      "matchPackageNames": ["@codemirror/state"],
+      "allowedVersions": "6.7.6"
+    },
+    {
+      "description": "Match the installed Obsidian SDK's exact CodeMirror peer dependency.",
+      "matchManagers": ["npm"],
+      "matchPackageNames": ["@codemirror/view"],
+      "allowedVersions": "6.43.13"
+    }
+  ]
+}
