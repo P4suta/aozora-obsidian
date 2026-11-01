@@ -1,4 +1,4 @@
-# syntax=docker/dockerfile:1.7
+# syntax=docker/dockerfile:1.28
 # aozora-obsidian dev / build / wasm container.
 #
 # Two toolchains coexist:
