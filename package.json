@@ -37,7 +37,7 @@
   "bugs": "https://github.com/P4suta/aozora-obsidian/issues",
   "dependencies": {
     "aozora-wasm": "file:./pkg",
-    "minimatch": "^10.2.6"
+    "minimatch": "^11.0.0"
   },
   "devDependencies": {
     "@biomejs/biome": "^2.6.4",
