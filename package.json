@@ -43,7 +43,7 @@
     "@biomejs/biome": "^2.6.4",
     "@codemirror/state": "6.7.6",
     "@codemirror/view": "6.43.13",
-    "@types/node": "^25.9.9",
+    "@types/node": "^26.0.0",
     "@vitest/coverage-istanbul": "^4.1.12",
     "esbuild": "^0.28.2",
     "fast-check": "^4.10.2",
