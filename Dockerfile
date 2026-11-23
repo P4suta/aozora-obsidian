@@ -101,7 +101,10 @@ COPY --from=wasm-builder /out/pkg /pkg
 ##############################################################################
 # Stage: bun-base — Bun image + just + git
 ##############################################################################
+FROM docker.io/library/node:24-bookworm-slim@sha256:dc26ae92c9fb15cf6b1d63e20f0944b2efe0f115b20e00be48fb23fceb061c54 AS node-runtime
+
 FROM oven/bun:${BUN_VERSION}-debian AS bun-base
+COPY --from=node-runtime /usr/local/bin/node /usr/local/bin/node
 
 RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
     --mount=type=cache,target=/var/lib/apt,sharing=locked \
