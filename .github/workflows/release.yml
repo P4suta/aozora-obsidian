@@ -46,7 +46,7 @@ jobs:
       - name: Create release zip
         working-directory: aozora-obsidian
         run: |
-          zip -j aozora-obsidian-${GITHUB_REF_NAME}.zip \
+          zip -j "aozora-obsidian-${GITHUB_REF_NAME}.zip" \
             main.js manifest.json styles.css aozora.wasm
 
       - name: Publish GitHub Release
